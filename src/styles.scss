@@ -1,0 +1,123 @@
+@use 'tailwindcss';
+
+/* ============================================
+   MARBELLA - Design System Tokens
+   Sistema de Gestión de Cajas
+   ============================================ */
+
+@theme {
+  /* ---- Primary: Azul Oscuro ---- */
+  --color-primary-50: #e8edf5;
+  --color-primary-100: #c5d1e8;
+  --color-primary-200: #9eb3d9;
+  --color-primary-300: #7795ca;
+  --color-primary-400: #597ebe;
+  --color-primary-500: #3b67b2;
+  --color-primary-600: #355fab;
+  --color-primary-700: #2d54a2;
+  --color-primary-800: #264a99;
+  --color-primary-900: #19398a;
+  --color-primary-950: #0f2460;
+
+  /* ---- Surface: Blancos y Pasteles ---- */
+  --color-surface-50: #ffffff;
+  --color-surface-100: #f8f9fc;
+  --color-surface-200: #f1f3f8;
+  --color-surface-300: #e4e8f0;
+  --color-surface-400: #d1d7e3;
+  --color-surface-500: #b8c1d1;
+  --color-surface-600: #8d99b0;
+  --color-surface-700: #6b7a94;
+  --color-surface-800: #4a5568;
+  --color-surface-900: #2d3748;
+  --color-surface-950: #1a202c;
+
+  /* ---- Semantic: Success ---- */
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  /* ---- Semantic: Warning ---- */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  /* ---- Semantic: Danger ---- */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  /* ---- Semantic: Info ---- */
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-200: #bfdbfe;
+  --color-info-300: #93c5fd;
+  --color-info-400: #60a5fa;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+  --color-info-700: #1d4ed8;
+
+  /* ---- Typography ---- */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  /* ---- Shadows ---- */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-dropdown: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+}
+
+/* ============================================
+   Global Base Styles
+   ============================================ */
+
+html,
+body {
+  @apply h-full bg-surface-100 text-surface-900 font-sans antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface-200;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-400 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-surface-500;
+}
+
+/* Focus ring utility */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-500;
+}
