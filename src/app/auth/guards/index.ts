@@ -1,1 +1,1 @@
-export { authGuard, guestGuard, adminGuard } from './auth.guard';
+export { authGuard, guestGuard, adminGuard, permissionGuard } from './auth.guard';

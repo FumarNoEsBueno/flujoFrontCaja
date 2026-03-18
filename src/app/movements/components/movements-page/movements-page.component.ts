@@ -1,29 +1,103 @@
-import { Component } from '@angular/core';
-import { PageHeaderComponent, CardComponent, ButtonComponent } from '../../../shared/components';
+import { Component, signal } from '@angular/core';
+
+import type { CajaAutocomplete, Movimiento } from '../../models';
+import { PageHeaderComponent } from '../../../shared/components';
+import { MovementsListComponent } from '../movements-list/movements-list.component';
+import { MovementFormComponent } from '../movement-form/movement-form.component';
+import { MovementDetailComponent } from '../movement-detail/movement-detail.component';
+import { MovementDeleteComponent } from '../movement-delete/movement-delete.component';
 
 @Component({
   selector: 'app-movements-page',
   standalone: true,
-  imports: [PageHeaderComponent, CardComponent, ButtonComponent],
+  imports: [
+    PageHeaderComponent,
+    MovementsListComponent,
+    MovementFormComponent,
+    MovementDetailComponent,
+    MovementDeleteComponent,
+  ],
   template: `
     <app-page-header
       title="Movimientos"
       subtitle="Registro de ingresos y egresos de caja"
-    >
-      <app-button variant="primary">
-        + Nuevo Movimiento
-      </app-button>
-    </app-page-header>
+    />
 
-    <app-card>
-      <div class="flex items-center justify-center py-16 text-surface-400">
-        <div class="text-center">
-          <span class="text-5xl mb-4 block">💰</span>
-          <p class="text-lg font-medium text-surface-600 mb-1">Sin movimientos</p>
-          <p class="text-sm">Los movimientos de caja aparecerán aquí</p>
-        </div>
-      </div>
-    </app-card>
+    <app-movements-list
+      (nuevoMovimiento)="onNuevoMovimiento($event)"
+      (verDetalle)="onVerDetalle($event)"
+      (eliminar)="onEliminar($event)"
+    />
+
+    <!-- Modal: Nuevo Movimiento -->
+    @if (mostrandoFormulario()) {
+      <app-movement-form
+        [cajasDisponibles]="cajasDisponibles()"
+        (cerrar)="cerrarFormulario()"
+        (guardado)="onMovimientoGuardado()"
+      />
+    }
+
+    <!-- Modal: Detalle -->
+    @if (movimientoDetalle() !== null) {
+      <app-movement-detail
+        [movimientoId]="movimientoDetalle()!"
+        (cerrar)="cerrarDetalle()"
+      />
+    }
+
+    <!-- Modal: Eliminar -->
+    @if (movimientoAEliminar() !== null) {
+      <app-movement-delete
+        [movimiento]="movimientoAEliminar()!"
+        (cerrar)="cerrarEliminar()"
+        (eliminado)="onMovimientoEliminado()"
+      />
+    }
   `,
 })
-export class MovementsPageComponent {}
+export class MovementsPageComponent {
+  mostrandoFormulario = signal(false);
+  cajasDisponibles    = signal<CajaAutocomplete[]>([]);
+  movimientoDetalle   = signal<number | null>(null);
+  movimientoAEliminar = signal<Movimiento | null>(null);
+
+  // ─── Formulario ────────────────────────────────────────────────────────────
+
+  onNuevoMovimiento(payload: { cajas: CajaAutocomplete[] }): void {
+    this.cajasDisponibles.set(payload.cajas);
+    this.mostrandoFormulario.set(true);
+  }
+
+  cerrarFormulario(): void {
+    this.mostrandoFormulario.set(false);
+  }
+
+  onMovimientoGuardado(): void {
+    this.mostrandoFormulario.set(false);
+  }
+
+  // ─── Detalle ───────────────────────────────────────────────────────────────
+
+  onVerDetalle(movimiento: Movimiento): void {
+    this.movimientoDetalle.set(movimiento.id);
+  }
+
+  cerrarDetalle(): void {
+    this.movimientoDetalle.set(null);
+  }
+
+  // ─── Eliminar ──────────────────────────────────────────────────────────────
+
+  onEliminar(movimiento: Movimiento): void {
+    this.movimientoAEliminar.set(movimiento);
+  }
+
+  cerrarEliminar(): void {
+    this.movimientoAEliminar.set(null);
+  }
+
+  onMovimientoEliminado(): void {
+    this.movimientoAEliminar.set(null);
+  }
+}

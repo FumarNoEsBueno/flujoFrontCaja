@@ -54,7 +54,7 @@ import { NgClass } from '@angular/common';
 })
 export class InputComponent implements ControlValueAccessor {
   label = input('');
-  type = input<'text' | 'email' | 'password' | 'number' | 'tel'>('text');
+  type = input<'text' | 'email' | 'password' | 'number' | 'tel' | 'date'>('text');
   placeholder = input('');
   required = input(false);
   error = input('');

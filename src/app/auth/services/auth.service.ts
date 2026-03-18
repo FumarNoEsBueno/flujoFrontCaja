@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, User } from '../models';
-import { ApiResponse } from '../../core/models';
+import type { LoginRequest, LoginResponse, MeResponse } from '../models';
+import type { ApiResponse } from '../../core/models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -18,8 +18,10 @@ export class AuthService {
     );
   }
 
-  me(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.baseUrl}${environment.auth.meUrl}`);
+  me(): Observable<ApiResponse<MeResponse>> {
+    return this.http.get<ApiResponse<MeResponse>>(
+      `${this.baseUrl}${environment.auth.meUrl}`,
+    );
   }
 
   refreshToken(): Observable<ApiResponse<LoginResponse>> {
@@ -30,6 +32,9 @@ export class AuthService {
   }
 
   logout(): Observable<ApiResponse<void>> {
-    return this.http.post<ApiResponse<void>>(`${this.baseUrl}${environment.auth.logoutUrl}`, {});
+    return this.http.post<ApiResponse<void>>(
+      `${this.baseUrl}${environment.auth.logoutUrl}`,
+      {},
+    );
   }
 }

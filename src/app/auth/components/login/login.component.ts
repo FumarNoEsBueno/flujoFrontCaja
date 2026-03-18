@@ -162,15 +162,20 @@ export class LoginComponent {
     });
   }
 
+  /**
+   * Después del login, llama a /auth/me para obtener datos del usuario + permisos.
+   * Los guarda en el store (que a su vez los persiste en localStorage).
+   */
   private fetchUserProfile(): void {
     this.authService.me().subscribe({
       next: (response) => {
-        if (response.success) {
-          this.authStore.setUser(response.data);
+        if (response.success && response.data) {
+          this.authStore.setUserData(response.data);
         }
         this.router.navigate(['/dashboard']);
       },
       error: () => {
+        // Aún sin perfil, dejamos pasar al dashboard
         this.router.navigate(['/dashboard']);
       },
     });

@@ -8,20 +8,26 @@ import {
   withHooks,
 } from '@ngrx/signals';
 
-import { AuthStatus, LoginResponse, User } from '../models';
+import type { AuthStatus, LoginResponse, MeResponse, Usuario } from '../models';
 import { TokenService } from '../services';
 
+// ─── State ───────────────────────────────────────────────────────────────────
+
 export interface AuthState {
-  user: User | null;
+  usuario: Usuario | null;
+  permisos: string[];
   status: AuthStatus;
   error: string | null;
 }
 
 const initialState: AuthState = {
-  user: null,
+  usuario: null,
+  permisos: [],
   status: 'idle',
   error: null,
 };
+
+// ─── Store ───────────────────────────────────────────────────────────────────
 
 export const AuthStore = signalStore(
   { providedIn: 'root' },
@@ -31,13 +37,27 @@ export const AuthStore = signalStore(
   withComputed((store) => ({
     isAuthenticated: computed(() => store.status() === 'authenticated'),
     isLoading: computed(() => store.status() === 'loading'),
-    userName: computed(() => store.user()?.name ?? ''),
-    userRole: computed(() => store.user()?.role?.name ?? ''),
-    isAdmin: computed(() => {
-      const role = store.user()?.role?.name;
-      return role === 'admin' || role === 'superadmin';
+
+    /** Nombre completo del usuario: "Manuel Pereira" */
+    userName: computed(() => {
+      const u = store.usuario();
+      if (!u) return '';
+      return [u.usua_nombre, u.usua_apellido_p, u.usua_apellido_m]
+        .filter(Boolean)
+        .join(' ');
     }),
-    userPermissions: computed(() => store.user()?.role?.permissions ?? []),
+
+    /** Nombre del rol: "Administrador" */
+    userRole: computed(() => store.usuario()?.rol?.role_nombre ?? ''),
+
+    /** Es Administrador */
+    isAdmin: computed(() => {
+      const rolNombre = store.usuario()?.rol?.role_nombre?.toLowerCase();
+      return rolNombre === 'administrador';
+    }),
+
+    /** Lista de permisos como string[] */
+    userPermissions: computed(() => store.permisos()),
   })),
 
   withMethods((store) => {
@@ -48,6 +68,10 @@ export const AuthStore = signalStore(
         patchState(store, { status: 'loading', error: null });
       },
 
+      /**
+       * Después de login exitoso: guarda token y marca como authenticated.
+       * El usuario se cargará con setUserData() tras llamar a /auth/me.
+       */
       setAuthenticated(response: LoginResponse): void {
         tokenService.setToken(response.access_token);
         patchState(store, {
@@ -56,8 +80,18 @@ export const AuthStore = signalStore(
         });
       },
 
-      setUser(user: User): void {
-        patchState(store, { user, status: 'authenticated' });
+      /**
+       * Recibe la respuesta de /auth/me y persiste usuario + permisos
+       * tanto en el store como en localStorage.
+       */
+      setUserData(data: MeResponse): void {
+        tokenService.setUserData(data.usuario);
+        tokenService.setPermissions(data.permisos);
+        patchState(store, {
+          usuario: data.usuario,
+          permisos: data.permisos,
+          status: 'authenticated',
+        });
       },
 
       setError(error: string): void {
@@ -65,13 +99,17 @@ export const AuthStore = signalStore(
       },
 
       logout(): void {
-        tokenService.clearToken();
+        tokenService.clearAll();
         patchState(store, initialState);
       },
 
-      hasPermission(resource: string, action: string): boolean {
-        const permissions = store.user()?.role?.permissions ?? [];
-        return permissions.some((p) => p.resource === resource && p.action === (action as any));
+      /**
+       * Verifica si el usuario tiene un permiso específico.
+       * Los permisos son strings que representan vistas del frontend
+       * (e.g. 'dashboard', 'usuarios', 'productos').
+       */
+      hasPermission(permiso: string): boolean {
+        return store.permisos().includes(permiso);
       },
     };
   }),
@@ -79,8 +117,23 @@ export const AuthStore = signalStore(
   withHooks({
     onInit(store) {
       const tokenService = inject(TokenService);
+
+      // Si hay token, rehidratar desde localStorage
       if (tokenService.hasToken()) {
-        patchState(store, { status: 'loading' });
+        const usuario = tokenService.getUserData();
+        const permisos = tokenService.getPermissions();
+
+        if (usuario) {
+          patchState(store, {
+            usuario,
+            permisos,
+            status: 'authenticated',
+          });
+        } else {
+          // Hay token pero no userData → marcar loading para que el guard deje pasar
+          // y el componente pueda llamar a /auth/me
+          patchState(store, { status: 'loading' });
+        }
       }
     },
   }),

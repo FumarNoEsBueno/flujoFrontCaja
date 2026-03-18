@@ -1,7 +1,7 @@
 export {
-  type User,
-  type Role,
-  type Permission,
+  type Usuario,
+  type Rol,
+  type MeResponse,
   type LoginRequest,
   type LoginResponse,
   type AuthStatus,

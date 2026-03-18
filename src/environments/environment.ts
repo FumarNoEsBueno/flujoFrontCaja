@@ -10,6 +10,9 @@ export const environment = {
   api: {
     dashboard: '/dashboard',
     movements: '/movements',
+    cajas: '/cajas',
+    movimientos: '/movimientos',
+    productos: '/productos',
     reports: '/reports',
     products: '/products',
     users: '/users',
