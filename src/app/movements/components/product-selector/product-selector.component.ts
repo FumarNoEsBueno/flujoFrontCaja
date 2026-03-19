@@ -16,10 +16,17 @@ import { lastValueFrom } from 'rxjs';
 
 import { ProductoService } from '../../services/producto.service';
 import type { ProductoAutocomplete, ProductoLineaItem } from '../../models';
+import {
+  IconSearchComponent,
+  IconMinusComponent,
+  IconPlusComponent,
+  IconCloseComponent,
+} from '../../../shared/icons';
 
 @Component({
   selector: 'app-product-selector',
   standalone: true,
+  imports: [IconSearchComponent, IconMinusComponent, IconPlusComponent, IconCloseComponent],
   template: `
     <div class="space-y-2">
       <label class="block text-xs font-semibold text-surface-600 uppercase tracking-wide">
@@ -46,10 +53,7 @@ import type { ProductoAutocomplete, ProductoLineaItem } from '../../models';
         />
         <!-- Icono lupa -->
         <div class="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 pointer-events-none">
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-          </svg>
+          <app-icon-search class="w-4 h-4" />
         </div>
       </div>
 
@@ -80,10 +84,7 @@ import type { ProductoAutocomplete, ProductoLineaItem } from '../../models';
                          cursor-pointer"
                   aria-label="Decrementar cantidad"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
-                  </svg>
+                  <app-icon-minus class="w-3.5 h-3.5" [strokeWidth]="2.5" />
                 </button>
 
                 <span class="w-6 text-center text-sm font-semibold text-surface-900 select-none">
@@ -98,10 +99,7 @@ import type { ProductoAutocomplete, ProductoLineaItem } from '../../models';
                          cursor-pointer"
                   aria-label="Incrementar cantidad"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                  </svg>
+                  <app-icon-plus class="w-3.5 h-3.5" [strokeWidth]="2.5" />
                 </button>
               </div>
 
@@ -113,10 +111,7 @@ import type { ProductoAutocomplete, ProductoLineaItem } from '../../models';
                        flex-shrink-0 rounded p-0.5"
                 aria-label="Eliminar producto"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+                <app-icon-close class="w-4 h-4" />
               </button>
             </div>
           }

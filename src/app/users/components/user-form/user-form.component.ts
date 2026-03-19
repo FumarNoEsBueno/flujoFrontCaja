@@ -17,6 +17,7 @@ import {
 } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../../../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components';
+import { IconCloseComponent, IconWarningComponent, IconSpinnerComponent } from '../../../shared/icons';
 
 @Component({
   selector: 'app-user-form',
@@ -26,6 +27,9 @@ import type { AutocompleteOption } from '../../../shared/components';
     ButtonComponent,
     InputComponent,
     CustomAutocompleteComponent,
+    IconCloseComponent,
+    IconWarningComponent,
+    IconSpinnerComponent,
   ],
   template: `
     <!-- Overlay -->
@@ -55,9 +59,7 @@ import type { AutocompleteOption } from '../../../shared/components';
             class="text-surface-400 hover:text-surface-700 transition-colors cursor-pointer
                    rounded-lg p-1 hover:bg-surface-100"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon-close class="w-5 h-5" />
           </button>
         </div>
 
@@ -70,10 +72,7 @@ import type { AutocompleteOption } from '../../../shared/components';
               <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200
                           rounded-lg animate-[fadeIn_150ms_ease-out_both]">
                 <div class="flex-shrink-0 w-5 h-5 mt-0.5 text-danger-500">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                  </svg>
+                  <app-icon-warning class="w-5 h-5" />
                 </div>
                 <p class="text-sm text-danger-700 leading-snug">{{ errorMsg() }}</p>
               </div>
@@ -82,10 +81,7 @@ import type { AutocompleteOption } from '../../../shared/components';
             <!-- Loading detalle (edición) -->
             @if (esEdicion() && detalleQuery.isPending()) {
               <div class="flex items-center justify-center py-8 text-surface-400">
-                <svg class="w-5 h-5 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
+                <app-icon-spinner class="w-5 h-5 animate-spin mr-2" />
                 Cargando datos...
               </div>
             }

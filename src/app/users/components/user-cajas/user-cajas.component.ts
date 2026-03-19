@@ -17,6 +17,7 @@ import {
 } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../../../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components';
+import { IconCloseComponent, IconSpinnerComponent } from '../../../shared/icons';
 
 @Component({
   selector: 'app-user-cajas',
@@ -26,6 +27,8 @@ import type { AutocompleteOption } from '../../../shared/components';
     ButtonComponent,
     BadgeComponent,
     CustomAutocompleteComponent,
+    IconCloseComponent,
+    IconSpinnerComponent,
   ],
   template: `
     <!-- Overlay -->
@@ -52,9 +55,7 @@ import type { AutocompleteOption } from '../../../shared/components';
             class="text-surface-400 hover:text-surface-700 transition-colors cursor-pointer
                    rounded-lg p-1 hover:bg-surface-100"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon-close class="w-5 h-5" />
           </button>
         </div>
 
@@ -69,10 +70,7 @@ import type { AutocompleteOption } from '../../../shared/components';
 
             @if (cajasQuery.isPending()) {
               <div class="flex items-center gap-2 text-surface-400 py-4">
-                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
+                <app-icon-spinner class="w-4 h-4 animate-spin" />
                 <span class="text-sm">Cargando cajas...</span>
               </div>
             } @else if (cajasAsignadas().length === 0) {

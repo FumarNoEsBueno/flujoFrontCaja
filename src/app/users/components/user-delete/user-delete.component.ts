@@ -5,11 +5,12 @@ import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../../services/usuario.service';
 import type { UsuarioTabla } from '../../models';
 import { ButtonComponent, ToastService } from '../../../shared/components';
+import { IconWarningComponent, IconCloseComponent } from '../../../shared/icons';
 
 @Component({
   selector: 'app-user-delete',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, IconWarningComponent, IconCloseComponent],
   template: `
     <!-- Overlay -->
     <div
@@ -26,10 +27,7 @@ import { ButtonComponent, ToastService } from '../../../shared/components';
           <!-- Ícono + título -->
           <div class="flex items-center gap-4 mb-4">
             <div class="w-12 h-12 rounded-full bg-danger-100 flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-danger-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-              </svg>
+              <app-icon-warning class="w-6 h-6 text-danger-600" />
             </div>
             <div>
               <h2 class="text-lg font-bold text-surface-900">Eliminar Usuario</h2>
@@ -51,9 +49,7 @@ import { ButtonComponent, ToastService } from '../../../shared/components';
             <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200
                         rounded-lg mb-5 animate-[fadeIn_150ms_ease-out_both]">
               <div class="flex-shrink-0 w-5 h-5 mt-0.5 text-danger-500">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+                <app-icon-close class="w-5 h-5" />
               </div>
               <p class="text-sm text-danger-700 leading-snug">
                 No se pudo eliminar el usuario. Intentá de nuevo.

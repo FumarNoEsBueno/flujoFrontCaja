@@ -2,11 +2,17 @@ import { Component, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ToastService } from './toast.service';
 import type { Toast, ToastType } from './toast.service';
+import {
+  IconCheckComponent,
+  IconCloseComponent,
+  IconWarningComponent,
+  IconInfoComponent,
+} from '../../icons';
 
 @Component({
   selector: 'app-toast-container',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, IconCheckComponent, IconCloseComponent, IconWarningComponent, IconInfoComponent],
   template: `
     <!-- Portal fijo top-right -->
     <div
@@ -26,24 +32,16 @@ import type { Toast, ToastType } from './toast.service';
           <div [ngClass]="iconWrapperClass(toast.type)" class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-0.5">
             @switch (toast.type) {
               @case ('success') {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                </svg>
+                <app-icon-check class="w-4 h-4" [strokeWidth]="2.5" />
               }
               @case ('error') {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+                <app-icon-close class="w-4 h-4" [strokeWidth]="2.5" />
               }
               @case ('warning') {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                </svg>
+                <app-icon-warning class="w-4 h-4" [strokeWidth]="2.5" />
               }
               @case ('info') {
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
-                </svg>
+                <app-icon-info class="w-4 h-4" [strokeWidth]="2.5" />
               }
             }
           </div>
@@ -65,9 +63,7 @@ import type { Toast, ToastType } from './toast.service';
                    cursor-pointer rounded-md p-0.5 -mr-0.5 -mt-0.5"
             aria-label="Cerrar"
           >
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon-close class="w-4 h-4" [strokeWidth]="2" />
           </button>
         </div>
       }

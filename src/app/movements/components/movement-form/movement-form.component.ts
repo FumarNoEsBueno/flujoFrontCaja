@@ -14,11 +14,12 @@ import {
 } from '../../../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components';
 import { ProductSelectorComponent } from '../product-selector/product-selector.component';
+import { IconCloseComponent, IconWarningComponent } from '../../../shared/icons';
 
 @Component({
   selector: 'app-movement-form',
   standalone: true,
-  imports: [ButtonComponent, InputComponent, FormsModule, CustomAutocompleteComponent, ProductSelectorComponent],
+  imports: [ButtonComponent, InputComponent, FormsModule, CustomAutocompleteComponent, ProductSelectorComponent, IconCloseComponent, IconWarningComponent],
   template: `
     <!-- Overlay -->
     <div
@@ -42,9 +43,7 @@ import { ProductSelectorComponent } from '../product-selector/product-selector.c
             class="text-surface-400 hover:text-surface-700 transition-colors cursor-pointer
                    rounded-lg p-1 hover:bg-surface-100"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon-close class="w-5 h-5" />
           </button>
         </div>
 
@@ -57,10 +56,7 @@ import { ProductSelectorComponent } from '../product-selector/product-selector.c
             <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200
                         rounded-lg animate-[fadeIn_150ms_ease-out_both]">
               <div class="flex-shrink-0 w-5 h-5 mt-0.5 text-danger-500">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                </svg>
+                <app-icon-warning class="w-5 h-5" />
               </div>
               <p class="text-sm text-danger-700 leading-snug">{{ errorMsg() }}</p>
             </div>

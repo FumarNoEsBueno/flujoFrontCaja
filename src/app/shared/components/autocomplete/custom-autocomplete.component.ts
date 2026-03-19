@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { IconCloseComponent, IconChevronDownComponent } from '../../icons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ export interface AutocompleteOption {
 @Component({
   selector: 'app-custom-autocomplete',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, IconCloseComponent, IconChevronDownComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -77,18 +78,13 @@ export interface AutocompleteOption {
               class="text-surface-400 hover:text-surface-700 transition-colors cursor-pointer rounded"
               aria-label="Limpiar selección"
             >
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
+              <app-icon-close class="w-3.5 h-3.5" [strokeWidth]="2.5" />
             </button>
           }
-          <svg
+          <app-icon-chevron-down
             class="w-4 h-4 text-surface-400 transition-transform duration-200"
-            [ngClass]="{ 'rotate-180': open() }"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-          </svg>
+            [class.rotate-180]="open()"
+          />
         </div>
       </div>
 

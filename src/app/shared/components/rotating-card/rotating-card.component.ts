@@ -8,6 +8,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { IconChevronLeftComponent, IconChevronRightComponent } from '../../icons';
 
 export interface RotatingItem {
   id: number | string;
@@ -20,7 +21,7 @@ export interface RotatingItem {
 @Component({
   selector: 'app-rotating-card',
   standalone: true,
-  imports: [NgClass],
+  imports: [NgClass, IconChevronLeftComponent, IconChevronRightComponent],
   template: `
     <div
       class="bg-white rounded-xl border border-surface-200 shadow-card transition-shadow duration-200 p-6 flex flex-col gap-4 min-h-[140px]"
@@ -83,9 +84,7 @@ export interface RotatingItem {
             (click)="prev()"
             title="Anterior"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+            <app-icon-chevron-left class="w-3.5 h-3.5" [strokeWidth]="2.5" />
           </button>
 
           <!-- Dots indicadores -->
@@ -116,9 +115,7 @@ export interface RotatingItem {
             (click)="next()"
             title="Siguiente"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+            <app-icon-chevron-right class="w-3.5 h-3.5" [strokeWidth]="2.5" />
           </button>
         </div>
       }

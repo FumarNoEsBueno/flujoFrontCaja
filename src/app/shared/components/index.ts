@@ -15,3 +15,5 @@ export { CustomAutocompleteComponent } from './autocomplete/custom-autocomplete.
 export type { AutocompleteOption } from './autocomplete/custom-autocomplete.component';
 export { RotatingCardComponent } from './rotating-card/rotating-card.component';
 export type { RotatingItem } from './rotating-card/rotating-card.component';
+export { ExcelModalComponent } from './excel-modal/excel-modal.component';
+export type { ExcelConfig } from './excel-modal/excel-modal.component';

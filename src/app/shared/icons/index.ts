@@ -1,0 +1,16 @@
+export { IconSpinnerComponent }          from './icon-spinner.component';
+export { IconSearchComponent }           from './icon-search.component';
+export { IconLogoutComponent }           from './icon-logout.component';
+export { IconCloseComponent }            from './icon-close.component';
+export { IconCheckComponent }            from './icon-check.component';
+export { IconWarningComponent }          from './icon-warning.component';
+export { IconInfoComponent }             from './icon-info.component';
+export { IconChevronDownComponent }      from './icon-chevron-down.component';
+export { IconChevronLeftComponent }      from './icon-chevron-left.component';
+export { IconChevronRightComponent }     from './icon-chevron-right.component';
+export { IconChevronDoubleRightComponent } from './icon-chevron-double-right.component';
+export { IconExcelComponent }            from './icon-excel.component';
+export { IconCopyComponent }             from './icon-copy.component';
+export { IconCheckCircleComponent }      from './icon-check-circle.component';
+export { IconMinusComponent }            from './icon-minus.component';
+export { IconPlusComponent }             from './icon-plus.component';

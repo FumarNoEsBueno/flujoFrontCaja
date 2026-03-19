@@ -3,11 +3,18 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 
 import { MovimientoService } from '../../services/movimiento.service';
 import { ButtonComponent, BadgeComponent, LoadingComponent } from '../../../shared/components';
+import {
+  IconCloseComponent,
+  IconWarningComponent,
+  IconChevronDownComponent,
+  IconCheckComponent,
+  IconCopyComponent,
+} from '../../../shared/icons';
 
 @Component({
   selector: 'app-movement-detail',
   standalone: true,
-  imports: [ButtonComponent, BadgeComponent, LoadingComponent],
+  imports: [ButtonComponent, BadgeComponent, LoadingComponent, IconCloseComponent, IconWarningComponent, IconChevronDownComponent, IconCheckComponent, IconCopyComponent],
   template: `
     <!-- Overlay -->
     <div
@@ -35,9 +42,7 @@ import { ButtonComponent, BadgeComponent, LoadingComponent } from '../../../shar
             class="text-surface-400 hover:text-surface-700 transition-colors cursor-pointer
                    rounded-lg p-1 hover:bg-surface-100"
           >
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <app-icon-close class="w-5 h-5" />
           </button>
         </div>
 
@@ -61,11 +66,7 @@ import { ButtonComponent, BadgeComponent, LoadingComponent } from '../../../shar
               <div class="flex items-start gap-3 p-3.5 bg-warning-50 border border-warning-200 rounded-lg">
 
                 <!-- Ícono warning -->
-                <svg class="w-5 h-5 text-warning-500 flex-shrink-0 mt-0.5" fill="none"
-                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                </svg>
+                <app-icon-warning class="w-5 h-5 text-warning-500 flex-shrink-0 mt-0.5" />
 
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-semibold text-warning-800">Los montos no coinciden</p>
@@ -87,11 +88,10 @@ import { ButtonComponent, BadgeComponent, LoadingComponent } from '../../../shar
                         class="inline-flex items-center gap-1.5 text-xs font-medium text-warning-700
                                hover:text-warning-900 transition-colors cursor-pointer"
                       >
-                        <svg class="w-3.5 h-3.5 transition-transform duration-200"
-                             [class.rotate-180]="motivosVisibles()"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
+                        <app-icon-chevron-down
+                          class="w-3.5 h-3.5 transition-transform duration-200"
+                          [class.rotate-180]="motivosVisibles()"
+                        />
                         {{ motivosVisibles() ? 'Ocultar' : 'Ver' }} posibles motivos
                       </button>
 
@@ -182,17 +182,9 @@ import { ButtonComponent, BadgeComponent, LoadingComponent } from '../../../shar
                   aria-label="Copiar ID de transacción"
                 >
                   @if (copiado()) {
-                    <svg class="w-4 h-4 text-success-500" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                    </svg>
+                    <app-icon-check class="w-4 h-4 text-success-500" [strokeWidth]="2.5" />
                   } @else {
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                         stroke="currentColor" stroke-width="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                    </svg>
+                    <app-icon-copy class="w-4 h-4" />
                   }
                 </button>
               </div>

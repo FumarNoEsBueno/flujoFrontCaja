@@ -3,10 +3,16 @@ import {
   input,
   output,
   computed,
+  signal,
+  inject,
 } from '@angular/core';
 
 import { ButtonComponent } from '../button/button.component';
 import { CardComponent } from '../card/card.component';
+import { ExcelModalComponent } from '../excel-modal/excel-modal.component';
+import type { ExcelConfig } from '../excel-modal/excel-modal.component';
+import { AuthStore } from '../../../auth/store/auth.store';
+import { IconExcelComponent } from '../../icons';
 
 // ─── Column Definition ────────────────────────────────────────────────────────
 
@@ -44,7 +50,7 @@ export interface TablePagination {
 @Component({
   selector: 'app-custom-table',
   standalone: true,
-  imports: [CardComponent, ButtonComponent],
+  imports: [CardComponent, ButtonComponent, ExcelModalComponent, IconExcelComponent],
   template: `
     <!-- Loading skeleton -->
     @if (loading()) {
@@ -106,6 +112,21 @@ export interface TablePagination {
     <!-- Empty -->
     @else if (!loading() && rows().length === 0) {
       <app-card>
+        <!-- Toolbar vacío con botón Excel -->
+        @if (mostrarBotonExcel()) {
+          <div class="flex justify-end pb-4 border-b border-surface-200 mb-4">
+            <app-button
+              variant="outline"
+              size="sm"
+              (onClick)="abrirExcelModal()"
+            >
+              <span class="flex items-center gap-1.5">
+                <app-icon-excel class="w-4 h-4 text-success-600" />
+                Excel
+              </span>
+            </app-button>
+          </div>
+        }
         <div class="flex items-center justify-center py-16 text-surface-400">
           <div class="text-center">
             <span class="text-5xl mb-4 block">{{ emptyIcon() }}</span>
@@ -119,6 +140,22 @@ export interface TablePagination {
     <!-- Table -->
     @else {
       <app-card [padding]="'none'">
+        <!-- Toolbar -->
+        @if (mostrarBotonExcel()) {
+          <div class="flex justify-end px-6 py-3 border-b border-surface-200">
+            <app-button
+              variant="outline"
+              size="sm"
+              (onClick)="abrirExcelModal()"
+            >
+              <span class="flex items-center gap-1.5">
+                <app-icon-excel class="w-4 h-4 text-success-600" />
+                Excel
+              </span>
+            </app-button>
+          </div>
+        }
+
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -200,9 +237,19 @@ export interface TablePagination {
         }
       </app-card>
     }
+
+    <!-- Excel Modal -->
+    @if (excelModalAbierto() && excelConfig()) {
+      <app-excel-modal
+        [config]="excelConfig()!"
+        (cerrar)="cerrarExcelModal()"
+      />
+    }
   `,
 })
 export class CustomTableComponent {
+  private readonly authStore = inject(AuthStore);
+
   // ─── Inputs ────────────────────────────────────────────────────────────────
 
   columns    = input.required<TableColumn[]>();
@@ -218,6 +265,9 @@ export class CustomTableComponent {
   /** Filas a mostrar en el skeleton (default: 5) */
   skeletonCount = input<number>(5);
 
+  /** Config Excel opcional — si se pasa y el usuario tiene el permiso, aparece el botón */
+  excelConfig = input<ExcelConfig | null>(null);
+
   // ─── Outputs ───────────────────────────────────────────────────────────────
 
   nextPage    = output<void>();
@@ -225,6 +275,18 @@ export class CustomTableComponent {
 
   /** Emite { action: 'Ver' | 'Eliminar' | ..., row } cuando se hace click en una acción */
   actionClick = output<{ action: string; row: Record<string, unknown> }>();
+
+  // ─── Estado interno ────────────────────────────────────────────────────────
+
+  excelModalAbierto = signal(false);
+
+  // ─── Computed ──────────────────────────────────────────────────────────────
+
+  mostrarBotonExcel = computed(() => {
+    const cfg = this.excelConfig();
+    if (!cfg) return false;
+    return this.authStore.hasPermission(cfg.permiso);
+  });
 
   // ─── Skeleton helpers ──────────────────────────────────────────────────────
 
@@ -234,6 +296,16 @@ export class CustomTableComponent {
     // Anchos deterministas por índice — evita NG0100 ExpressionChangedAfterItHasBeenChecked
     const widths = ['60%', '75%', '50%', '80%', '65%'];
     return widths[index % widths.length];
+  }
+
+  // ─── Excel modal ───────────────────────────────────────────────────────────
+
+  abrirExcelModal(): void {
+    this.excelModalAbierto.set(true);
+  }
+
+  cerrarExcelModal(): void {
+    this.excelModalAbierto.set(false);
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────

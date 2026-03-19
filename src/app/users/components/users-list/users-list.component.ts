@@ -11,8 +11,9 @@ import {
   ButtonComponent,
   CardComponent,
   CustomTableComponent,
+  ToastService,
 } from '../../../shared/components';
-import type { TableAction, TableColumn } from '../../../shared/components';
+import type { TableAction, TableColumn, ExcelConfig } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../../../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components';
 
@@ -90,6 +91,7 @@ import type { AutocompleteOption } from '../../../shared/components';
       [error]="usuariosQuery.isError() ? 'Error al cargar los usuarios' : null"
       [pagination]="paginacion()"
       [actions]="acciones"
+      [excelConfig]="excelConfigUsuarios"
       emptyIcon="👥"
       emptyTitle="Sin usuarios"
       emptyMessage="No se encontraron usuarios con los filtros aplicados."
@@ -102,6 +104,7 @@ import type { AutocompleteOption } from '../../../shared/components';
 export class UsersListComponent {
   private readonly usuarioService = inject(UsuarioService);
   private readonly rolService     = inject(RolService);
+  private readonly toast          = inject(ToastService);
 
   // ─── Outputs ─────────────────────────────────────────────────────────────
 
@@ -160,6 +163,28 @@ export class UsersListComponent {
     { key: 'rolNombre',  label: 'Rol' },
     { key: 'totalCajas', label: 'Cajas',    align: 'center' },
   ];
+
+  // ─── Excel Config ─────────────────────────────────────────────────────────
+
+  readonly excelConfigUsuarios: ExcelConfig = {
+    title: 'Usuarios — Excel',
+    permiso: 'usuarios.excel',
+    canPlantilla: true,
+    canExportar: true,
+    canImportar: true,
+    onPlantilla: () => {
+      this.toast.info('Plantilla', 'Descargando plantilla de usuarios...');
+      console.log('[Excel] Obtener Plantilla');
+    },
+    onExportar: () => {
+      this.toast.info('Exportar', 'Exportando datos de usuarios...');
+      console.log('[Excel] Exportar Datos');
+    },
+    onImportar: (file: File) => {
+      this.toast.success('Importar', `Archivo recibido: ${file.name}`);
+      console.log('[Excel] Importar Data', file);
+    },
+  };
 
   // ─── Acciones ─────────────────────────────────────────────────────────────
 
