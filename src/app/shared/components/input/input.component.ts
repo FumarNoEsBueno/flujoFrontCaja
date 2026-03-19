@@ -2,6 +2,9 @@ import { Component, input, forwardRef, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 
+// Counter estático para IDs únicos y deterministas (sin Math.random())
+let _inputIdCounter = 0;
+
 @Component({
   selector: 'app-input',
   standalone: true,
@@ -59,7 +62,7 @@ export class InputComponent implements ControlValueAccessor {
   required = input(false);
   error = input('');
   hint = input('');
-  inputId = input(`input-${Math.random().toString(36).slice(2, 9)}`);
+  inputId = input(`input-${++_inputIdCounter}`);
 
   value = signal('');
   isDisabled = signal(false);

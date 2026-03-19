@@ -4,6 +4,8 @@ import {
   output,
   signal,
   computed,
+  input,
+  effect,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { injectQuery } from '@tanstack/angular-query-experimental';
@@ -142,6 +144,10 @@ export class MovementsListComponent {
   private readonly cajaService       = inject(CajaService);
   private readonly authStore         = inject(AuthStore);
 
+  // ─── Inputs desde el dashboard ───────────────────────────────────────────
+  cajaPreseleccionadaId     = input<number | null>(null);
+  cajaPreseleccionadaNombre = input<string | null>(null);
+
   // ─── Outputs ───────────────────────────────────────────────────────────────
 
   nuevoMovimiento = output<{ cajas: CajaAutocomplete[] }>();
@@ -166,6 +172,23 @@ export class MovementsListComponent {
   filtrosAplicados = signal<MovimientoFilters>({});
   /** Incrementa cada vez que el usuario presiona Filtrar — fuerza re-fetch aunque los filtros no cambien */
   filtrarVersion   = signal(0);
+
+  // ─── Preselección desde dashboard ────────────────────────────────────────
+
+  constructor() {
+    effect(() => {
+      const cajaId     = this.cajaPreseleccionadaId();
+      const cajaNombre = this.cajaPreseleccionadaNombre();
+      if (cajaId && cajaNombre) {
+        this._filtroCaja.set({ id: cajaId, label: cajaNombre });
+        // Aplicar filtro automáticamente
+        this.filtrosAplicados.set({ caja_id: cajaId });
+        this.paginaActual.set(1);
+        this.filtrarVersion.update((v) => v + 1);
+        this.haFiltrado.set(true);
+      }
+    });
+  }
 
   // ─── Query de cajas (autocomplete) ────────────────────────────────────────
 

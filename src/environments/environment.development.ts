@@ -15,7 +15,7 @@ export const environment = {
     productos: '/productos',
     reports: '/reports',
     products: '/products',
-    users: '/users',
+    users: '/usuarios',
     roles: '/roles',
     settings: '/settings',
   },

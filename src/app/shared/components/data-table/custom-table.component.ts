@@ -72,7 +72,7 @@ export interface TablePagination {
                     <td class="px-6 py-4">
                       <div
                         class="h-3.5 bg-surface-100 rounded animate-pulse"
-                        [style.width]="skeletonWidth()"
+                        [style.width]="skeletonWidthFor(row)"
                       ></div>
                     </td>
                   }
@@ -230,10 +230,10 @@ export class CustomTableComponent {
 
   skeletonRows = computed(() => Array.from({ length: this.skeletonCount() }, (_, i) => i));
 
-  skeletonWidth(): string {
-    // Alterna anchos para que no parezcan idénticas
+  skeletonWidthFor(index: number): string {
+    // Anchos deterministas por índice — evita NG0100 ExpressionChangedAfterItHasBeenChecked
     const widths = ['60%', '75%', '50%', '80%', '65%'];
-    return widths[Math.floor(Math.random() * widths.length)];
+    return widths[index % widths.length];
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────

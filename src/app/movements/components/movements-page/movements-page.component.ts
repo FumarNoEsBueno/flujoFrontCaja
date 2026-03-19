@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 import type { CajaAutocomplete, Movimiento } from '../../models';
 import { PageHeaderComponent } from '../../../shared/components';
@@ -24,6 +25,8 @@ import { MovementDeleteComponent } from '../movement-delete/movement-delete.comp
     />
 
     <app-movements-list
+      [cajaPreseleccionadaId]="cajaPreseleccionadaId()"
+      [cajaPreseleccionadaNombre]="cajaPreseleccionadaNombre()"
       (nuevoMovimiento)="onNuevoMovimiento($event)"
       (verDetalle)="onVerDetalle($event)"
       (eliminar)="onEliminar($event)"
@@ -56,11 +59,25 @@ import { MovementDeleteComponent } from '../movement-delete/movement-delete.comp
     }
   `,
 })
-export class MovementsPageComponent {
-  mostrandoFormulario = signal(false);
-  cajasDisponibles    = signal<CajaAutocomplete[]>([]);
-  movimientoDetalle   = signal<number | null>(null);
-  movimientoAEliminar = signal<Movimiento | null>(null);
+export class MovementsPageComponent implements OnInit {
+  private readonly router = inject(Router);
+
+  mostrandoFormulario       = signal(false);
+  cajasDisponibles          = signal<CajaAutocomplete[]>([]);
+  movimientoDetalle         = signal<number | null>(null);
+  movimientoAEliminar       = signal<Movimiento | null>(null);
+  cajaPreseleccionadaId     = signal<number | null>(null);
+  cajaPreseleccionadaNombre = signal<string | null>(null);
+
+  ngOnInit(): void {
+    const state = this.router.getCurrentNavigation()?.extras?.state
+      ?? (history.state as Record<string, unknown>);
+
+    if (state?.['cajaId']) {
+      this.cajaPreseleccionadaId.set(Number(state['cajaId']));
+      this.cajaPreseleccionadaNombre.set(String(state['cajaNombre'] ?? ''));
+    }
+  }
 
   // ─── Formulario ────────────────────────────────────────────────────────────
 

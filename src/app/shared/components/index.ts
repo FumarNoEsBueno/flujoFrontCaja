@@ -13,3 +13,5 @@ export { ToastService } from './toast/toast.service';
 export type { Toast, ToastType } from './toast/toast.service';
 export { CustomAutocompleteComponent } from './autocomplete/custom-autocomplete.component';
 export type { AutocompleteOption } from './autocomplete/custom-autocomplete.component';
+export { RotatingCardComponent } from './rotating-card/rotating-card.component';
+export type { RotatingItem } from './rotating-card/rotating-card.component';
