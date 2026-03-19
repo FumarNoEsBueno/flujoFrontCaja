@@ -59,6 +59,7 @@ import { UserCajasComponent } from '../user-cajas/user-cajas.component';
   `,
 })
 export class UsersPageComponent {
+
   // ─── Estado de modales ───────────────────────────────────────────────────
 
   mostrandoFormulario = signal(false);

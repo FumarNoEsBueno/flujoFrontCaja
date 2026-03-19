@@ -16,6 +16,7 @@ import {
 import type { TableAction, TableColumn, ExcelConfig } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../../../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components';
+import { UserExportComponent } from '../user-export/user-export.component';
 
 @Component({
   selector: 'app-users-list',
@@ -26,6 +27,7 @@ import type { AutocompleteOption } from '../../../shared/components';
     ButtonComponent,
     CustomTableComponent,
     CustomAutocompleteComponent,
+    UserExportComponent,
   ],
   template: `
     <!-- ─── Filtros ─────────────────────────────────────────────────── -->
@@ -99,6 +101,10 @@ import type { AutocompleteOption } from '../../../shared/components';
       (nextPage)="irPagina(paginaActual() + 1)"
       (actionClick)="onAccion($event)"
     />
+
+    @if (mostrandoExport()) {
+      <app-user-export (cerrar)="mostrandoExport.set(false)" />
+    }
   `,
 })
 export class UsersListComponent {
@@ -111,6 +117,10 @@ export class UsersListComponent {
   editar        = output<UsuarioTabla>();
   eliminar      = output<UsuarioTabla>();
   gestionarCajas = output<UsuarioTabla>();
+
+  // ─── Estado de modales ────────────────────────────────────────────────────
+
+  mostrandoExport = signal(false);
 
   // ─── Filtros (estado del formulario) ─────────────────────────────────────
 
@@ -172,18 +182,9 @@ export class UsersListComponent {
     canPlantilla: true,
     canExportar: true,
     canImportar: true,
-    onPlantilla: () => {
-      this.toast.info('Plantilla', 'Descargando plantilla de usuarios...');
-      console.log('[Excel] Obtener Plantilla');
-    },
-    onExportar: () => {
-      this.toast.info('Exportar', 'Exportando datos de usuarios...');
-      console.log('[Excel] Exportar Datos');
-    },
-    onImportar: (file: File) => {
-      this.toast.success('Importar', `Archivo recibido: ${file.name}`);
-      console.log('[Excel] Importar Data', file);
-    },
+    onPlantilla: () => void this.descargarPlantilla(),
+    onExportar: () => this.mostrandoExport.set(true),
+    onImportar: (file: File) => void this.importar(file),
   };
 
   // ─── Acciones ─────────────────────────────────────────────────────────────
@@ -235,6 +236,48 @@ export class UsersListComponent {
       this.gestionarCajas.emit(usuario);
     } else if (event.action === 'Eliminar') {
       this.eliminar.emit(usuario);
+    }
+  }
+
+  // ─── Excel ────────────────────────────────────────────────────────────────
+
+  async descargarPlantilla(): Promise<void> {
+    this.toast.info('Plantilla', 'Preparando descarga...');
+    try {
+      const blob = await firstValueFrom(this.usuarioService.descargarPlantilla());
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `plantilla_usuarios_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.toast.success('Plantilla descargada', 'Ya podés abrirla en Excel y completar los datos.');
+    } catch (err) {
+      console.error('[descargarPlantilla]', err);
+      this.toast.error('Error al descargar', 'No se pudo descargar la plantilla. Intentá de nuevo.');
+    }
+  }
+
+  async importar(archivo: File): Promise<void> {
+    const emailReporte = prompt('¿A qué correo enviamos el reporte de errores?')?.trim();
+    if (!emailReporte) return;
+
+    this.toast.info('Importando', `Procesando ${archivo.name}...`);
+    try {
+      const res = await firstValueFrom(this.usuarioService.importar(archivo, emailReporte));
+      if (res.data.errores === 0) {
+        this.toast.success('Importación exitosa', `${res.data.importados} usuarios importados correctamente.`);
+      } else {
+        this.toast.warning(
+          'Importación con errores',
+          `${res.data.importados} importados, ${res.data.errores} con errores. Revisá tu correo.`,
+        );
+      }
+      // Refrescar la tabla
+      this.buscarVersion.update((v) => v + 1);
+    } catch (err) {
+      console.error('[importar]', err);
+      this.toast.error('Error al importar', 'No se pudo procesar el archivo. Verificá que sea una planilla válida.');
     }
   }
 }

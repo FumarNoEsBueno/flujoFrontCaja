@@ -86,4 +86,45 @@ export class UsuarioService {
       {},
     );
   }
+
+  // ─── Excel ───────────────────────────────────────────────────────────────
+
+  descargarPlantilla(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/plantilla`, { responseType: 'blob' });
+  }
+
+  exportar(params: {
+    nombre?: string;
+    rut?: string;
+    role_id?: number;
+    orden: 'asc' | 'desc';
+    todos: boolean;
+    limite?: number;
+  }): Observable<Blob> {
+    let httpParams = new HttpParams()
+      .set('orden', params.orden)
+      .set('todos', String(params.todos));
+
+    if (params.nombre)  httpParams = httpParams.set('nombre',  params.nombre);
+    if (params.rut)     httpParams = httpParams.set('rut',     params.rut);
+    if (params.role_id) httpParams = httpParams.set('role_id', String(params.role_id));
+    if (!params.todos && params.limite) {
+      httpParams = httpParams.set('limite', String(params.limite));
+    }
+
+    return this.http.get(`${this.baseUrl}/exportar`, {
+      responseType: 'blob',
+      params: httpParams,
+    });
+  }
+
+  importar(archivo: File, emailReporte: string): Observable<ApiResponse<{ importados: number; errores: number; total: number }>> {
+    const form = new FormData();
+    form.append('archivo', archivo);
+    form.append('email_reporte', emailReporte);
+    return this.http.post<ApiResponse<{ importados: number; errores: number; total: number }>>(
+      `${this.baseUrl}/importar`,
+      form,
+    );
+  }
 }
