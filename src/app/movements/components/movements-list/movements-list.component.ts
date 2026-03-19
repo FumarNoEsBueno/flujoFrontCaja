@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { injectQuery } from '@tanstack/angular-query-experimental';
+import { firstValueFrom } from 'rxjs';
 
 import { MovimientoService } from '../../services/movimiento.service';
 import { CajaService } from '../../services/caja.service';
@@ -22,10 +23,12 @@ import {
   ButtonComponent,
   CardComponent,
   CustomTableComponent,
+  ToastService,
 } from '../../../shared/components';
-import type { TableColumn, TableAction } from '../../../shared/components';
+import type { TableColumn, TableAction, ExcelConfig } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../.././../shared/components/autocomplete/custom-autocomplete.component';
 import type { AutocompleteOption } from '../../../shared/components/autocomplete/custom-autocomplete.component';
+import { MovementExportComponent } from '../movement-export/movement-export.component';
 
 @Component({
   selector: 'app-movements-list',
@@ -36,6 +39,7 @@ import type { AutocompleteOption } from '../../../shared/components/autocomplete
     ButtonComponent,
     CustomTableComponent,
     CustomAutocompleteComponent,
+    MovementExportComponent,
   ],
   template: `
     <!-- ─── Filtros ─────────────────────────────────────────────────── -->
@@ -119,6 +123,7 @@ import type { AutocompleteOption } from '../../../shared/components/autocomplete
         [error]="movimientosQuery.isError() ? 'Error al cargar los movimientos' : null"
         [pagination]="paginacion()"
         [actions]="acciones"
+        [excelConfig]="excelConfigMovimientos"
         emptyIcon="💰"
         emptyTitle="Sin movimientos"
         emptyMessage="No se encontraron movimientos con los filtros aplicados."
@@ -137,12 +142,17 @@ import type { AutocompleteOption } from '../../../shared/components/autocomplete
         </p>
       </div>
     }
+
+    @if (mostrandoExport()) {
+      <app-movement-export (cerrar)="mostrandoExport.set(false)" />
+    }
   `,
 })
 export class MovementsListComponent {
   private readonly movimientoService = inject(MovimientoService);
   private readonly cajaService       = inject(CajaService);
   private readonly authStore         = inject(AuthStore);
+  private readonly toast             = inject(ToastService);
 
   // ─── Inputs desde el dashboard ───────────────────────────────────────────
   cajaPreseleccionadaId     = input<number | null>(null);
@@ -153,6 +163,10 @@ export class MovementsListComponent {
   nuevoMovimiento = output<{ cajas: CajaAutocomplete[] }>();
   verDetalle      = output<Movimiento>();
   eliminar        = output<Movimiento>();
+
+  // ─── Estado de modales ────────────────────────────────────────────────────
+
+  mostrandoExport = signal(false);
 
   // ─── Filtros (estado del formulario) ──────────────────────────────────────
 
@@ -269,6 +283,19 @@ export class MovementsListComponent {
     },
   ];
 
+  // ─── Excel Config ─────────────────────────────────────────────────────────
+
+  readonly excelConfigMovimientos: ExcelConfig = {
+    title: 'Movimientos — Excel',
+    permiso: 'movimientos.excel',
+    canPlantilla: true,
+    canExportar: true,
+    canImportar: true,
+    onPlantilla: () => void this.descargarPlantilla(),
+    onExportar: () => this.mostrandoExport.set(true),
+    onImportar: (file: File) => void this.importar(file),
+  };
+
   // ─── Acciones de la tabla ─────────────────────────────────────────────────
 
   readonly acciones: TableAction[] = [
@@ -326,6 +353,48 @@ export class MovementsListComponent {
       this.verDetalle.emit(movimiento);
     } else if (event.action === 'Eliminar') {
       this.eliminar.emit(movimiento);
+    }
+  }
+
+  // ─── Excel ────────────────────────────────────────────────────────────────
+
+  async descargarPlantilla(): Promise<void> {
+    this.toast.info('Plantilla', 'Preparando descarga...');
+    try {
+      const blob = await firstValueFrom(this.movimientoService.descargarPlantilla());
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `plantilla_movimientos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      this.toast.success('Plantilla descargada', 'Ya podés abrirla en Excel y completar los datos.');
+    } catch (err) {
+      console.error('[descargarPlantilla]', err);
+      this.toast.error('Error al descargar', 'No se pudo descargar la plantilla. Intentá de nuevo.');
+    }
+  }
+
+  async importar(archivo: File): Promise<void> {
+    const emailReporte = prompt('¿A qué correo enviamos el reporte de errores?')?.trim();
+    if (!emailReporte) return;
+
+    this.toast.info('Importando', `Procesando ${archivo.name}...`);
+    try {
+      const res = await firstValueFrom(this.movimientoService.importar(archivo, emailReporte));
+      if (res.data.errores === 0) {
+        this.toast.success('Importación exitosa', `${res.data.importados} movimientos importados correctamente.`);
+      } else {
+        this.toast.warning(
+          'Importación con errores',
+          `${res.data.importados} importados, ${res.data.errores} con errores. Revisá tu correo.`,
+        );
+      }
+      // Refrescar la tabla
+      this.filtrarVersion.update((v) => v + 1);
+    } catch (err) {
+      console.error('[importar]', err);
+      this.toast.error('Error al importar', 'No se pudo procesar el archivo. Verificá que sea una planilla válida.');
     }
   }
 }

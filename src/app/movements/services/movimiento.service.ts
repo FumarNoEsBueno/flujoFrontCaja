@@ -57,4 +57,43 @@ export class MovimientoService {
   delete(id: number): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${id}`);
   }
+
+  // ─── Excel ───────────────────────────────────────────────────────────────
+
+  descargarPlantilla(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/plantilla`, { responseType: 'blob' });
+  }
+
+  exportar(params: {
+    desde?: string;
+    hasta?: string;
+    todos: boolean;
+    limite?: number;
+  }): Observable<Blob> {
+    let httpParams = new HttpParams().set('todos', String(params.todos));
+
+    if (params.desde) httpParams = httpParams.set('desde', params.desde);
+    if (params.hasta) httpParams = httpParams.set('hasta', params.hasta);
+    if (!params.todos && params.limite) {
+      httpParams = httpParams.set('limite', String(params.limite));
+    }
+
+    return this.http.get(`${this.baseUrl}/exportar`, {
+      responseType: 'blob',
+      params: httpParams,
+    });
+  }
+
+  importar(
+    archivo: File,
+    emailReporte: string,
+  ): Observable<ApiResponse<{ importados: number; errores: number; total: number }>> {
+    const form = new FormData();
+    form.append('archivo', archivo);
+    form.append('email_reporte', emailReporte);
+    return this.http.post<ApiResponse<{ importados: number; errores: number; total: number }>>(
+      `${this.baseUrl}/importar`,
+      form,
+    );
+  }
 }
