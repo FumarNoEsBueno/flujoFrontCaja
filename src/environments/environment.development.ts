@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8000/api',
+  apiBaseUrl: 'https://api-marbella-dev.biobioreciclajes.cl/api',
   auth: {
     loginUrl: '/auth/login',
     refreshUrl: '/auth/refresh',
