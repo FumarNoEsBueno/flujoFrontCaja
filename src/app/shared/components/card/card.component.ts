@@ -5,6 +5,7 @@ import { NgClass } from '@angular/common';
   selector: 'app-card',
   standalone: true,
   imports: [NgClass],
+  host: { class: 'block' },
   template: `
     <div
       [ngClass]="{
@@ -13,6 +14,7 @@ import { NgClass } from '@angular/common';
         'p-8': padding() === 'lg',
         'p-0': padding() === 'none',
         'hover:shadow-card-hover': hoverable(),
+        'flex flex-col h-full': stretch(),
       }"
       class="bg-white rounded-xl border border-surface-200 shadow-card transition-shadow duration-200"
     >
@@ -34,4 +36,5 @@ export class CardComponent {
   padding = input<'none' | 'sm' | 'md' | 'lg'>('md');
   hoverable = input(false);
   divider = input(false);
+  stretch = input(false);
 }

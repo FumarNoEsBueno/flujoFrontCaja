@@ -48,116 +48,121 @@ import { IconWarningComponent } from '../../../shared/icons';
         No se pudo cargar el perfil. Intentá recargar la página.
       </div>
     } @else {
-      <div class="grid gap-6 max-w-2xl">
+      <div class="grid gap-6">
 
         <!-- ── Card: Datos personales (solo lectura) ────────────────────── -->
         <app-card title="Datos personales">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
 
             <div>
-              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1">Nombre completo</p>
-              <p class="text-sm font-medium text-surface-900">{{ nombreCompleto() }}</p>
+              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1.5">Nombre completo</p>
+              <p class="text-sm font-semibold text-surface-900">{{ nombreCompleto() }}</p>
             </div>
 
             <div>
-              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1">RUT</p>
-              <p class="text-sm font-medium text-surface-900">{{ rut() }}</p>
+              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1.5">RUT</p>
+              <p class="text-sm font-semibold text-surface-900">{{ rut() }}</p>
             </div>
 
             <div>
-              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1">Rol</p>
-              <p class="text-sm font-medium text-surface-900">{{ perfilQuery.data()?.data?.rolNombre || authStore.userRole() || '—' }}</p>
+              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1.5">Rol</p>
+              <p class="text-sm font-semibold text-surface-900">{{ perfilQuery.data()?.data?.rolNombre || authStore.userRole() || '—' }}</p>
             </div>
 
             <div>
-              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1">Correo</p>
-              <p class="text-sm font-medium text-surface-900">{{ perfilQuery.data()?.data?.correo ?? '—' }}</p>
+              <p class="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1.5">Correo</p>
+              <p class="text-sm font-semibold text-surface-900">{{ perfilQuery.data()?.data?.correo ?? '—' }}</p>
             </div>
 
           </div>
         </app-card>
 
-        <!-- ── Card: Correo electrónico ─────────────────────────────────── -->
-        <app-card title="Correo electrónico">
-          <form (ngSubmit)="submitCorreo()" class="space-y-4">
+        <!-- ── Fila: Correo + Contraseña ─────────────────────────────────── -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-            @if (correoErrorMsg()) {
-              <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200 rounded-lg">
-                <app-icon-warning class="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
-                <p class="text-sm text-danger-700 leading-snug">{{ correoErrorMsg() }}</p>
+          <!-- ── Card: Correo electrónico ──────────────────────────────── -->
+          <app-card title="Correo electrónico" [stretch]="true">
+            <form (ngSubmit)="submitCorreo()" class="flex flex-col flex-1 gap-5">
+
+              @if (correoErrorMsg()) {
+                <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200 rounded-lg">
+                  <app-icon-warning class="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
+                  <p class="text-sm text-danger-700 leading-snug">{{ correoErrorMsg() }}</p>
+                </div>
+              }
+
+              <app-input
+                label="Correo electrónico"
+                [(ngModel)]="_correo"
+                name="correo"
+                type="email"
+                placeholder="correo@ejemplo.com"
+              />
+
+              <div class="flex justify-end pt-2 mt-auto">
+                <app-button
+                  type="submit"
+                  variant="primary"
+                  [loading]="correoMutation.isPending()"
+                  [disabled]="!correoValido()"
+                >
+                  Guardar correo
+                </app-button>
               </div>
-            }
 
-            <app-input
-              label="Correo electrónico"
-              [(ngModel)]="_correo"
-              name="correo"
-              type="email"
-              placeholder="correo@ejemplo.com"
-            />
+            </form>
+          </app-card>
 
-            <div class="flex justify-end">
-              <app-button
-                type="submit"
-                variant="primary"
-                [loading]="correoMutation.isPending()"
-                [disabled]="!correoValido()"
-              >
-                Guardar correo
-              </app-button>
-            </div>
+          <!-- ── Card: Cambiar contraseña ──────────────────────────────── -->
+          <app-card title="Cambiar contraseña" [stretch]="true">
+            <form (ngSubmit)="submitPassword()" class="flex flex-col flex-1 gap-5">
 
-          </form>
-        </app-card>
+              @if (passwordErrorMsg()) {
+                <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200 rounded-lg">
+                  <app-icon-warning class="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
+                  <p class="text-sm text-danger-700 leading-snug">{{ passwordErrorMsg() }}</p>
+                </div>
+              }
 
-        <!-- ── Card: Cambiar contraseña ────────────────────────────────── -->
-        <app-card title="Cambiar contraseña">
-          <form (ngSubmit)="submitPassword()" class="space-y-4">
+              <app-input
+                label="Contraseña actual"
+                [(ngModel)]="_passwordActual"
+                name="password_actual"
+                type="password"
+                placeholder="Tu contraseña actual"
+              />
 
-            @if (passwordErrorMsg()) {
-              <div class="flex items-start gap-3 p-3.5 bg-danger-50 border border-danger-200 rounded-lg">
-                <app-icon-warning class="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
-                <p class="text-sm text-danger-700 leading-snug">{{ passwordErrorMsg() }}</p>
+              <app-input
+                label="Nueva contraseña"
+                [(ngModel)]="_passwordNuevo"
+                name="password_nuevo"
+                type="password"
+                placeholder="Mínimo 8 caracteres"
+              />
+
+              <app-input
+                label="Confirmar nueva contraseña"
+                [(ngModel)]="_passwordConfirmacion"
+                name="password_nuevo_confirmation"
+                type="password"
+                placeholder="Repetí la nueva contraseña"
+              />
+
+              <div class="flex justify-end pt-2">
+                <app-button
+                  type="submit"
+                  variant="primary"
+                  [loading]="passwordMutation.isPending()"
+                  [disabled]="!passwordValido()"
+                >
+                  Cambiar contraseña
+                </app-button>
               </div>
-            }
 
-            <app-input
-              label="Contraseña actual"
-              [(ngModel)]="_passwordActual"
-              name="password_actual"
-              type="password"
-              placeholder="Tu contraseña actual"
-            />
+            </form>
+          </app-card>
 
-            <app-input
-              label="Nueva contraseña"
-              [(ngModel)]="_passwordNuevo"
-              name="password_nuevo"
-              type="password"
-              placeholder="Mínimo 8 caracteres"
-            />
-
-            <app-input
-              label="Confirmar nueva contraseña"
-              [(ngModel)]="_passwordConfirmacion"
-              name="password_nuevo_confirmation"
-              type="password"
-              placeholder="Repetí la nueva contraseña"
-            />
-
-            <div class="flex justify-end">
-              <app-button
-                type="submit"
-                variant="primary"
-                [loading]="passwordMutation.isPending()"
-                [disabled]="!passwordValido()"
-              >
-                Cambiar contraseña
-              </app-button>
-            </div>
-
-          </form>
-        </app-card>
+        </div>
 
       </div>
     }
