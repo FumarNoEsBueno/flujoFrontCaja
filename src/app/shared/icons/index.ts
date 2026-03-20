@@ -14,3 +14,4 @@ export { IconCopyComponent }             from './icon-copy.component';
 export { IconCheckCircleComponent }      from './icon-check-circle.component';
 export { IconMinusComponent }            from './icon-minus.component';
 export { IconPlusComponent }             from './icon-plus.component';
+export { IconUserComponent }             from './icon-user.component';

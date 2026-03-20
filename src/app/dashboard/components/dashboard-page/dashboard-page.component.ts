@@ -18,24 +18,24 @@ import { DashboardService } from '../../services/dashboard.service';
     />
 
     <!-- ─── KPI Cards ──────────────────────────────────────────────────────── -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
 
       <!-- Ventas Hoy (estática, suma total) -->
       <app-card>
-        <div class="flex items-center justify-between">
-          <div>
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0 flex-1">
             <p class="text-sm font-medium text-surface-500">Ventas Hoy</p>
             @if (dashboardQuery.isPending()) {
               <div class="h-8 w-24 bg-surface-100 rounded animate-pulse mt-1"></div>
             } @else {
-              <p class="text-2xl font-bold text-surface-900 mt-1">
+              <p class="text-xl sm:text-2xl font-bold text-surface-900 mt-1 truncate">
                 {{ ventasHoyFormateadas() }}
               </p>
             }
             <p class="text-xs text-surface-400 mt-0.5">Total movimientos del día</p>
           </div>
-          <div class="w-12 h-12 bg-success-50 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">💵</span>
+          <div class="w-11 h-11 sm:w-12 sm:h-12 bg-success-50 rounded-xl flex items-center justify-center shrink-0">
+            <span class="text-xl sm:text-2xl leading-none">💵</span>
           </div>
         </div>
       </app-card>

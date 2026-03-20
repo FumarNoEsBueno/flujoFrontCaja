@@ -13,6 +13,7 @@ export { ToastService } from './toast/toast.service';
 export type { Toast, ToastType } from './toast/toast.service';
 export { CustomAutocompleteComponent } from './autocomplete/custom-autocomplete.component';
 export type { AutocompleteOption } from './autocomplete/custom-autocomplete.component';
+export { MultiAutocompleteComponent } from './multi-autocomplete/multi-autocomplete.component';
 export { RotatingCardComponent } from './rotating-card/rotating-card.component';
 export type { RotatingItem } from './rotating-card/rotating-card.component';
 export { ExcelModalComponent } from './excel-modal/excel-modal.component';

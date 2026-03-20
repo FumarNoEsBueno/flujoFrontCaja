@@ -1,29 +1,93 @@
-import { Component } from '@angular/core';
-import { PageHeaderComponent, CardComponent, ButtonComponent } from '../../../shared/components';
+import { Component, signal } from '@angular/core';
+
+import type { ProductoTabla } from '../../models';
+import { PageHeaderComponent, ButtonComponent } from '../../../shared/components';
+import { ProductsListComponent } from '../products-list/products-list.component';
+import { ProductFormComponent } from '../product-form/product-form.component';
+import { ProductDeleteComponent } from '../product-delete/product-delete.component';
 
 @Component({
   selector: 'app-products-page',
   standalone: true,
-  imports: [PageHeaderComponent, CardComponent, ButtonComponent],
+  imports: [
+    PageHeaderComponent,
+    ButtonComponent,
+    ProductsListComponent,
+    ProductFormComponent,
+    ProductDeleteComponent,
+  ],
   template: `
     <app-page-header
       title="Productos"
-      subtitle="Administra el catálogo de productos"
+      subtitle="Administración del catálogo de productos"
     >
-      <app-button variant="primary">
+      <app-button variant="primary" (onClick)="onNuevoProducto()">
         + Nuevo Producto
       </app-button>
     </app-page-header>
 
-    <app-card>
-      <div class="flex items-center justify-center py-16 text-surface-400">
-        <div class="text-center">
-          <span class="text-5xl mb-4 block">📦</span>
-          <p class="text-lg font-medium text-surface-600 mb-1">Sin productos</p>
-          <p class="text-sm">El catálogo de productos aparecerá aquí</p>
-        </div>
-      </div>
-    </app-card>
+    <app-products-list
+      (editar)="onEditar($event)"
+      (eliminar)="onEliminar($event)"
+    />
+
+    @if (mostrandoFormulario()) {
+      <app-product-form
+        [producto]="productoAEditar()"
+        (cerrar)="cerrar()"
+        (guardado)="onGuardado()"
+      />
+    }
+
+    @if (productoAEliminar() !== null) {
+      <app-product-delete
+        [producto]="productoAEliminar()!"
+        (cerrar)="cerrar()"
+        (eliminado)="onEliminado()"
+      />
+    }
   `,
 })
-export class ProductsPageComponent {}
+export class ProductsPageComponent {
+
+  // ─── Estado de modales ───────────────────────────────────────────────────
+
+  mostrandoFormulario = signal(false);
+  productoAEditar     = signal<ProductoTabla | null>(null);
+  productoAEliminar   = signal<ProductoTabla | null>(null);
+
+  // ─── Handlers: formulario ────────────────────────────────────────────────
+
+  onNuevoProducto(): void {
+    this.productoAEditar.set(null);
+    this.mostrandoFormulario.set(true);
+  }
+
+  onEditar(producto: ProductoTabla): void {
+    this.productoAEditar.set(producto);
+    this.mostrandoFormulario.set(true);
+  }
+
+  onGuardado(): void {
+    this.mostrandoFormulario.set(false);
+    this.productoAEditar.set(null);
+  }
+
+  // ─── Handlers: eliminar ──────────────────────────────────────────────────
+
+  onEliminar(producto: ProductoTabla): void {
+    this.productoAEliminar.set(producto);
+  }
+
+  onEliminado(): void {
+    this.productoAEliminar.set(null);
+  }
+
+  // ─── Cerrar todos los modales ────────────────────────────────────────────
+
+  cerrar(): void {
+    this.mostrandoFormulario.set(false);
+    this.productoAEditar.set(null);
+    this.productoAEliminar.set(null);
+  }
+}

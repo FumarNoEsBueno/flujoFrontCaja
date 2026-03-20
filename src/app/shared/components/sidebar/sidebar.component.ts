@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { AuthStore } from '../../../auth/store';
@@ -112,6 +112,8 @@ export class SidebarComponent {
   readonly authStore = inject(AuthStore);
   collapsed = signal(false);
 
+  collapseChange = output<boolean>();
+
   private readonly mainNavItems: SidebarNavItem[] = [
     {
       label: 'Dashboard',
@@ -198,5 +200,6 @@ export class SidebarComponent {
 
   toggleCollapse(): void {
     this.collapsed.update((v) => !v);
+    this.collapseChange.emit(this.collapsed());
   }
 }

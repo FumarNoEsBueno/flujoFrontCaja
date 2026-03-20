@@ -18,5 +18,6 @@ export const environment = {
     users: '/usuarios',
     roles: '/roles',
     settings: '/settings',
+    perfil: '/perfil',
   },
 };

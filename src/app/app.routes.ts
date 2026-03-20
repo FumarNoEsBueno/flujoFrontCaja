@@ -72,6 +72,13 @@ export const routes: Routes = [
 
       // ── Default redirect ──
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+      // ── Perfil (sin permissionGuard — cualquier usuario autenticado) ──
+      {
+        path: 'perfil',
+        loadChildren: () =>
+          import('./perfil/perfil.routes').then((m) => m.PERFIL_ROUTES),
+      },
     ],
   },
 

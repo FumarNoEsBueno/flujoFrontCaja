@@ -5,6 +5,26 @@ import { ButtonComponent, InputComponent } from '../../../shared/components';
 import { AuthStore } from '../../store';
 import { AuthService } from '../../services';
 
+// ─── Helpers de RUT ───────────────────────────────────────────────────────────
+/** Elimina puntos y deja sólo dígitos + dígito verificador (sin guión).
+ *  Ej: "12.345.678-9" → "123456789"  |  "12345678-9" → "123456789"
+ */
+function sanitizeRut(raw: string): string {
+  return raw.replace(/\./g, '').replace(/-/g, '').trim();
+}
+
+/** Formatea un RUT ingresado para mostrar "12.345.678-9" mientras el usuario escribe.
+ *  Acepta como entrada cualquier string con o sin puntos/guión.
+ */
+function formatRut(raw: string): string {
+  const clean = raw.replace(/[^0-9kK]/g, '');
+  if (clean.length === 0) return '';
+  const dv = clean.slice(-1);
+  const body = clean.slice(0, -1);
+  const withDots = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return withDots ? `${withDots}-${dv}` : dv;
+}
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -46,7 +66,7 @@ import { AuthService } from '../../services';
 
           <div>
             <h2 class="text-2xl font-bold text-surface-900 mb-1">Iniciar Sesión</h2>
-            <p class="text-surface-500 mb-8">Ingresa tus credenciales para acceder al sistema</p>
+            <p class="text-surface-500 mb-8">Ingresá tus credenciales para acceder al sistema</p>
           </div>
 
           @if (errorMessage()) {
@@ -123,6 +143,16 @@ export class LoginComponent {
     remember: [false],
   });
 
+  constructor() {
+    // ─── Formateo de RUT en tiempo real ──────────────────────────────────────
+    this.loginForm.get('rut')?.valueChanges.subscribe((raw) => {
+      const formatted = formatRut(raw ?? '');
+      if (formatted !== raw) {
+        this.loginForm.get('rut')?.setValue(formatted, { emitEvent: false });
+      }
+    });
+  }
+
   getFieldError(field: 'rut' | 'password'): string {
     const control = this.loginForm.get(field);
     if (!control?.touched || !control.errors) return '';
@@ -143,8 +173,10 @@ export class LoginComponent {
     this.authStore.setLoading();
 
     const { rut, password } = this.loginForm.getRawValue();
+    // Enviamos el RUT limpio (sin puntos ni guión) al backend
+    const rutLimpio = sanitizeRut(rut);
 
-    this.authService.login({ rut, password }).subscribe({
+    this.authService.login({ rut: rutLimpio, password }).subscribe({
       next: (response) => {
         if (response.success) {
           this.authStore.setAuthenticated(response.data);
@@ -155,7 +187,7 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        const message = err?.error?.message || 'Error al iniciar sesión. Intenta nuevamente.';
+        const message = err?.error?.message || 'Error al iniciar sesión. Intentá nuevamente.';
         this.authStore.setError(message);
         this.errorMessage.set(message);
       },

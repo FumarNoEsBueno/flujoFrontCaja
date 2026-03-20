@@ -24,10 +24,10 @@ export interface RotatingItem {
   imports: [NgClass, IconChevronLeftComponent, IconChevronRightComponent],
   template: `
     <div
-      class="bg-white rounded-xl border border-surface-200 shadow-card transition-shadow duration-200 p-6 flex flex-col gap-4 min-h-[140px]"
+      class="bg-white rounded-xl border border-surface-200 shadow-card transition-shadow duration-200 p-4 sm:p-6 flex flex-col gap-3"
     >
       <!-- Header: título + icono/acción -->
-      <div class="flex items-start justify-between">
+      <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-0.5 flex-1 min-w-0">
           <p class="text-sm font-medium text-surface-500 truncate">{{ title() }}</p>
 
@@ -35,13 +35,13 @@ export interface RotatingItem {
           <div class="relative h-8 overflow-hidden">
             @if (currentItem(); as item) {
               <p
-                class="text-2xl font-bold text-surface-900 leading-8 truncate transition-all duration-300"
+                class="text-xl sm:text-2xl font-bold text-surface-900 leading-8 truncate transition-all duration-300"
                 [ngClass]="{ 'opacity-0 translate-y-1': isTransitioning() }"
               >
                 {{ item.value }}
               </p>
             } @else {
-              <p class="text-2xl font-bold text-surface-400 leading-8">—</p>
+              <p class="text-xl sm:text-2xl font-bold text-surface-400 leading-8">—</p>
             }
           </div>
 
@@ -65,12 +65,12 @@ export interface RotatingItem {
         <!-- Slot de icono -->
         <button
           type="button"
-          class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 cursor-pointer transition-transform duration-150 active:scale-95"
+          class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 cursor-pointer transition-transform duration-150 active:scale-95"
           [ngClass]="iconBgClass()"
           (click)="onIconClick()"
           [title]="iconTitle()"
         >
-          <span class="text-2xl select-none">{{ icon() }}</span>
+          <span class="text-xl sm:text-2xl select-none leading-none">{{ icon() }}</span>
         </button>
       </div>
 
@@ -80,7 +80,7 @@ export interface RotatingItem {
           <!-- Flecha anterior -->
           <button
             type="button"
-            class="w-7 h-7 rounded-lg border border-surface-200 flex items-center justify-center text-surface-400 hover:text-surface-700 hover:border-surface-400 hover:bg-surface-50 transition-all duration-150 flex-shrink-0"
+            class="w-7 h-7 rounded-lg border border-surface-200 flex items-center justify-center text-surface-400 hover:text-surface-700 hover:border-surface-400 hover:bg-surface-50 transition-all duration-150 shrink-0"
             (click)="prev()"
             title="Anterior"
           >
@@ -88,19 +88,19 @@ export interface RotatingItem {
           </button>
 
           <!-- Dots indicadores -->
-          <div class="flex items-center gap-1.5 flex-1 justify-center">
+          <div class="flex items-center gap-1.5 flex-1 justify-center overflow-hidden">
             @for (item of items(); track item.id; let i = $index) {
               @if (currentIndex() === i) {
                 <button
                   type="button"
-                  class="w-5 h-2 rounded-full bg-primary-600 transition-all duration-300 flex-shrink-0"
+                  class="w-5 h-2 rounded-full bg-primary-600 transition-all duration-300 shrink-0"
                   (click)="goTo(i)"
                   [title]="item.label"
                 ></button>
               } @else {
                 <button
                   type="button"
-                  class="w-2 h-2 rounded-full bg-surface-300 hover:bg-surface-400 transition-all duration-300 flex-shrink-0"
+                  class="w-2 h-2 rounded-full bg-surface-300 hover:bg-surface-400 transition-all duration-300 shrink-0"
                   (click)="goTo(i)"
                   [title]="item.label"
                 ></button>
@@ -111,7 +111,7 @@ export interface RotatingItem {
           <!-- Flecha siguiente -->
           <button
             type="button"
-            class="w-7 h-7 rounded-lg border border-surface-200 flex items-center justify-center text-surface-400 hover:text-surface-700 hover:border-surface-400 hover:bg-surface-50 transition-all duration-150 flex-shrink-0"
+            class="w-7 h-7 rounded-lg border border-surface-200 flex items-center justify-center text-surface-400 hover:text-surface-700 hover:border-surface-400 hover:bg-surface-50 transition-all duration-150 shrink-0"
             (click)="next()"
             title="Siguiente"
           >
