@@ -1,1 +1,1 @@
-export type { Caja, CajaLocal, CajaAutocomplete, Movimiento, VerificacionMontos, MovimientoFilters, CreateMovimientoRequest, SimplePaginateMeta, SimplePaginatedResponse, ProductoAutocomplete, ProductoLineaItem, ProductoDelMovimiento } from './movimiento.model';
+export type { Caja, CajaLocal, CajaAutocomplete, Movimiento, VerificacionMontos, MovimientoFilters, CreateMovimientoRequest, UpdateMovimientoRequest, SimplePaginateMeta, SimplePaginatedResponse, ProductoAutocomplete, ProductoLineaItem, ProductoDelMovimiento } from './movimiento.model';

@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import type { ApiResponse } from '../../core/models';
 import type {
   CreateMovimientoRequest,
+  UpdateMovimientoRequest,
   Movimiento,
   MovimientoFilters,
   SimplePaginatedResponse,
@@ -52,6 +53,13 @@ export class MovimientoService {
     payload: CreateMovimientoRequest,
   ): Observable<ApiResponse<Movimiento>> {
     return this.http.post<ApiResponse<Movimiento>>(this.baseUrl, payload);
+  }
+
+  update(
+    id: number,
+    payload: UpdateMovimientoRequest,
+  ): Observable<ApiResponse<Movimiento>> {
+    return this.http.put<ApiResponse<Movimiento>>(`${this.baseUrl}/${id}`, payload);
   }
 
   delete(id: number): Observable<ApiResponse<null>> {

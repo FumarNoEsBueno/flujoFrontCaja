@@ -1,9 +1,11 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   HostListener,
   inject,
+  input,
   output,
   signal,
   ViewChild,
@@ -131,6 +133,11 @@ export class ProductSelectorComponent implements AfterViewInit, OnDestroy {
 
   productosChange = output<ProductoLineaItem[]>();
 
+  // ─── Inputs ───────────────────────────────────────────────────────────────
+
+  /** Líneas de productos para pre-popular el selector (usado en modo edit). */
+  initialLineas = input<ProductoLineaItem[]>([]);
+
   // ─── Estado ───────────────────────────────────────────────────────────────
 
   query = signal('');
@@ -160,6 +167,18 @@ export class ProductSelectorComponent implements AfterViewInit, OnDestroy {
   });
 
   // ─── Lifecycle ────────────────────────────────────────────────────────────
+
+  constructor() {
+    // Pre-populate lineas when provided (edit mode).
+    // effect() must be called within a reactive context (constructor or effect).
+    effect(() => {
+      const incoming = this.initialLineas();
+      if (incoming && incoming.length > 0) {
+        this.lineas.set(incoming);
+        this.emitir();
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     // Crear el nodo del portal y adjuntarlo al body

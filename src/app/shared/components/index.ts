@@ -1,5 +1,6 @@
 export { ButtonComponent } from './button/button.component';
 export { InputComponent } from './input/input.component';
+export { RutInputComponent } from './rut-input/rut-input.component';
 export { CardComponent } from './card/card.component';
 export { BadgeComponent } from './badge/badge.component';
 export { LoadingComponent } from './loading/loading.component';

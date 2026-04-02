@@ -30,12 +30,16 @@ import { MovementDeleteComponent } from '../movement-delete/movement-delete.comp
       (nuevoMovimiento)="onNuevoMovimiento($event)"
       (verDetalle)="onVerDetalle($event)"
       (eliminar)="onEliminar($event)"
+      (editar)="onEditarMovimiento($event)"
     />
 
     <!-- Modal: Nuevo Movimiento -->
     @if (mostrandoFormulario()) {
       <app-movement-form
         [cajasDisponibles]="cajasDisponibles()"
+        [mode]="formMode()"
+        [movimiento]="movimientoEditando()"
+        [id]="movimientoEditandoId()"
         (cerrar)="cerrarFormulario()"
         (guardado)="onMovimientoGuardado()"
       />
@@ -68,6 +72,9 @@ export class MovementsPageComponent implements OnInit {
   movimientoAEliminar       = signal<Movimiento | null>(null);
   cajaPreseleccionadaId     = signal<number | null>(null);
   cajaPreseleccionadaNombre = signal<string | null>(null);
+  formMode                  = signal<'create' | 'edit'>('create');
+  movimientoEditando        = signal<Movimiento | null>(null);
+  movimientoEditandoId      = signal<number | null>(null);
 
   ngOnInit(): void {
     const state = this.router.getCurrentNavigation()?.extras?.state
@@ -82,12 +89,25 @@ export class MovementsPageComponent implements OnInit {
   // ─── Formulario ────────────────────────────────────────────────────────────
 
   onNuevoMovimiento(payload: { cajas: CajaAutocomplete[] }): void {
+    this.formMode.set('create');
+    this.movimientoEditando.set(null);
+    this.movimientoEditandoId.set(null);
     this.cajasDisponibles.set(payload.cajas);
+    this.mostrandoFormulario.set(true);
+  }
+
+  onEditarMovimiento(movimiento: Movimiento): void {
+    this.formMode.set('edit');
+    this.movimientoEditando.set(movimiento);
+    this.movimientoEditandoId.set(movimiento.id);
     this.mostrandoFormulario.set(true);
   }
 
   cerrarFormulario(): void {
     this.mostrandoFormulario.set(false);
+    this.formMode.set('create');
+    this.movimientoEditando.set(null);
+    this.movimientoEditandoId.set(null);
   }
 
   onMovimientoGuardado(): void {

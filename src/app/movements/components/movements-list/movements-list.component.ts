@@ -163,6 +163,7 @@ export class MovementsListComponent {
   nuevoMovimiento = output<{ cajas: CajaAutocomplete[] }>();
   verDetalle      = output<Movimiento>();
   eliminar        = output<Movimiento>();
+  editar          = output<Movimiento>();
 
   // ─── Estado de modales ────────────────────────────────────────────────────
 
@@ -299,6 +300,7 @@ export class MovementsListComponent {
   // ─── Acciones de la tabla ─────────────────────────────────────────────────
 
   readonly acciones: TableAction[] = [
+    { label: 'Editar', variant: 'primary' },
     { label: 'Ver', variant: 'ghost' },
     { label: 'Eliminar', variant: 'danger' },
   ];
@@ -351,6 +353,8 @@ export class MovementsListComponent {
     const movimiento = event.row as unknown as Movimiento;
     if (event.action === 'Ver') {
       this.verDetalle.emit(movimiento);
+    } else if (event.action === 'Editar') {
+      this.editar.emit(movimiento);
     } else if (event.action === 'Eliminar') {
       this.eliminar.emit(movimiento);
     }

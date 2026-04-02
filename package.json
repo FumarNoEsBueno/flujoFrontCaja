@@ -21,6 +21,7 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@tanstack/angular-query-experimental": "^5.90.25",
     "@tanstack/query-core": "^5.90.20",
+    "chilean-rutify": "2.1.0",
     "lucide-angular": "^0.577.0",
     "postcss": "^8.5.8",
     "rxjs": "~7.8.0",

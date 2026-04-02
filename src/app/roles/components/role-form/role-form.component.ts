@@ -167,10 +167,13 @@ export class RoleFormComponent {
   set permisosSeleccionados(v: AutocompleteOption[]) { this._permisosSeleccionados.set(v ?? []); }
 
   constructor() {
-    const rolActual = this.rol();
-    if (rolActual) {
-      this._nombre.set(rolActual.nombre);
-    }
+    // Pre-poblar el nombre cuando llega el input rol (no disponible en constructor)
+    effect(() => {
+      const rolActual = this.rol();
+      if (rolActual) {
+        this._nombre.set(rolActual.nombre);
+      }
+    });
 
     // Pre-poblar los permisos seleccionados cuando llegan los datos del detalle
     effect(() => {

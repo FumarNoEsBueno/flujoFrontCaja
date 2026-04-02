@@ -1,9 +1,9 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
 
 import { MovimientoService } from '../../services/movimiento.service';
-import type { CajaAutocomplete, CreateMovimientoRequest, ProductoLineaItem } from '../../models';
+import type { CajaAutocomplete, CreateMovimientoRequest, Movimiento, ProductoLineaItem, UpdateMovimientoRequest } from '../../models';
 import {
   ButtonComponent,
   InputComponent,
@@ -35,8 +35,12 @@ import { IconCloseComponent, IconWarningComponent } from '../../../shared/icons'
         <!-- Header -->
         <div class="flex items-center justify-between p-6 border-b border-surface-200 flex-shrink-0">
           <div>
-            <h2 class="text-lg font-bold text-surface-900">Nuevo Movimiento</h2>
-            <p class="text-sm text-surface-500 mt-0.5">Completá los datos del movimiento</p>
+            <h2 class="text-lg font-bold text-surface-900">
+              {{ mode() === 'edit' ? 'Editar Movimiento' : 'Nuevo Movimiento' }}
+            </h2>
+            <p class="text-sm text-surface-500 mt-0.5">
+              {{ mode() === 'edit' ? 'Actualizá los datos del movimiento' : 'Completá los datos del movimiento' }}
+            </p>
           </div>
           <button
             (click)="cerrar.emit()"
@@ -62,15 +66,17 @@ import { IconCloseComponent, IconWarningComponent } from '../../../shared/icons'
             </div>
           }
 
-          <!-- Caja (autocomplete) -->
-          <app-custom-autocomplete
-            label="Caja"
-            placeholder="Buscá una caja..."
-            [required]="true"
-            [options]="cajasComoOpciones()"
-            [(ngModel)]="cajaSeleccionada"
-            name="caja"
-          />
+          <!-- Caja (autocomplete) — only shown in create mode -->
+          @if (mode() === 'create') {
+            <app-custom-autocomplete
+              label="Caja"
+              placeholder="Buscá una caja..."
+              [required]="true"
+              [options]="cajasComoOpciones()"
+              [(ngModel)]="cajaSeleccionada"
+              name="caja"
+            />
+          }
 
           <app-input
             label="Descripción"
@@ -113,6 +119,7 @@ import { IconCloseComponent, IconWarningComponent } from '../../../shared/icons'
 
           <!-- Selector de productos -->
           <app-product-selector
+            [initialLineas]="_productos()"
             (productosChange)="onProductosChange($event)"
           />
 
@@ -135,7 +142,7 @@ import { IconCloseComponent, IconWarningComponent } from '../../../shared/icons'
               [loading]="mutation.isPending()"
               [disabled]="!formValido()"
             >
-              Guardar
+              {{ mode() === 'edit' ? 'Actualizar' : 'Guardar' }}
             </app-button>
           </div>
         </form>
@@ -152,6 +159,15 @@ export class MovementFormComponent {
 
   /** Lista de cajas disponibles (cargada por MovementsListComponent) */
   cajasDisponibles = input<CajaAutocomplete[]>([]);
+
+  /** Modo del formulario: 'create' | 'edit' */
+  mode = input<'create' | 'edit'>('create');
+
+  /** Movimiento a editar (solo usado en modo edit) */
+  movimiento = input<Movimiento | null>(null);
+
+  /** ID del movimiento a editar (solo usado en modo edit) */
+  id = input<number | null>(null);
 
   // ─── Outputs ───────────────────────────────────────────────────────────────
 
@@ -185,7 +201,44 @@ export class MovementFormComponent {
   });
 
   /** Productos seleccionados en el selector */
-  private _productos = signal<ProductoLineaItem[]>([]);
+  _productos = signal<ProductoLineaItem[]>([]);
+
+  constructor() {
+    // Pre-populate form when in edit mode.
+    // IMPORTANT: read movimiento() BEFORE the if, so Angular tracks it as a dependency
+    // regardless of whether m is null. This ensures the effect re-runs when
+    // movimiento() is set AFTER formMode is changed to 'edit'.
+    effect(() => {
+      const m = this.movimiento(); // tracked unconditionally
+      const isEdit = this.mode() === 'edit';
+      if (!m || !isEdit) return;
+
+      // MovimientoResource returns fechaIngreso as d/m/Y, but date input needs Y-m-d
+      const fechaParts = m.fechaIngreso.split('/');
+      const fechaISO = fechaParts.length === 3
+        ? `${fechaParts[2]}-${fechaParts[1]}-${fechaParts[0]}`
+        : m.fechaIngreso;
+
+      // montoTotal may come from the API as a number — always convert to string
+      // for the form inputs which expect string values
+      this.form.set({
+        movi_descripcion: m.descripcion ?? '',
+        movi_fecha_ingreso: fechaISO,
+        movi_monto_total: String(m.montoTotal ?? ''),
+        movi_medio_pago: m.medioPago ?? '',
+        movi_propina: m.propina != null ? String(m.propina) : null,
+      });
+
+      if (m.productos && m.productos.length > 0) {
+        this._productos.set(m.productos.map((p) => ({
+          prod_id: p.id,
+          label: p.nombre ?? '',
+          precio: p.montoUnitario,
+          cantidad: p.cantidad,
+        })));
+      }
+    });
+  }
 
   onProductosChange(lineas: ProductoLineaItem[]): void {
     this._productos.set(lineas);
@@ -198,23 +251,37 @@ export class MovementFormComponent {
 
   formValido(): boolean {
     const f = this.form();
+    const isEdit = this.mode() === 'edit';
+    // Use String() to defensively convert — the API may return numbers
+    const descripcion = String(f.movi_descripcion ?? '').trim();
+    const fecha = String(f.movi_fecha_ingreso ?? '').trim();
+    const monto = String(f.movi_monto_total ?? '').trim();
+    const medioPago = String(f.movi_medio_pago ?? '').trim();
     return !!(
-      this._cajaSeleccionada() &&
-      f.movi_descripcion.trim() &&
-      f.movi_fecha_ingreso.trim() &&
-      f.movi_monto_total.trim() &&
-      f.movi_medio_pago.trim()
+      (isEdit || this._cajaSeleccionada()) &&
+      descripcion &&
+      fecha &&
+      monto &&
+      medioPago
     );
   }
 
   // ─── Mutation ──────────────────────────────────────────────────────────────
 
   mutation = injectMutation(() => ({
-    mutationFn: (payload: CreateMovimientoRequest) =>
-      this.movimientoService.create(payload).toPromise(),
+    mutationFn: (payload: CreateMovimientoRequest | UpdateMovimientoRequest) => {
+      if (this.mode() === 'edit' && this.id()) {
+        return this.movimientoService.update(this.id()!, payload as UpdateMovimientoRequest).toPromise();
+      }
+      return this.movimientoService.create(payload as CreateMovimientoRequest).toPromise();
+    },
     onSuccess: () => {
       this.queryClient.invalidateQueries({ queryKey: ['movimientos'] });
-      this.toast.success('Movimiento guardado', 'El movimiento fue registrado correctamente.');
+      if (this.mode() === 'edit') {
+        this.toast.success('Movimiento actualizado', 'El movimiento fue actualizado correctamente.');
+      } else {
+        this.toast.success('Movimiento guardado', 'El movimiento fue registrado correctamente.');
+      }
       this.guardado.emit();
     },
     onError: () => {
@@ -225,21 +292,37 @@ export class MovementFormComponent {
 
   submit(): void {
     const caja = this._cajaSeleccionada();
-    if (!this.formValido() || !caja) return;
+    const isEdit = this.mode() === 'edit';
+
+    if (!this.formValido()) return;
+    if (!isEdit && !caja) return; // caja required only on create
 
     this.errorMsg.set('');
 
     const lineas = this._productos();
-    const payload: CreateMovimientoRequest = {
-      ...this.form(),
-      caja_id: Number(caja.id),
-      ...(lineas.length > 0 && {
-        productos: lineas.map((l) => ({
-          prod_id: l.prod_id,
-          pdmo_cantidad: l.cantidad,
-        })),
-      }),
-    };
+    const basePayload = this.form();
+
+    // Build payload based on mode
+    const payload: CreateMovimientoRequest | UpdateMovimientoRequest = isEdit
+      ? {
+          ...basePayload,
+          ...(lineas.length > 0 && {
+            productos: lineas.map((l) => ({
+              prod_id: l.prod_id,
+              pdmo_cantidad: l.cantidad,
+            })),
+          }),
+        }
+      : {
+          ...basePayload,
+          caja_id: Number(caja!.id),
+          ...(lineas.length > 0 && {
+            productos: lineas.map((l) => ({
+              prod_id: l.prod_id,
+              pdmo_cantidad: l.cantidad,
+            })),
+          }),
+        };
 
     this.mutation.mutate(payload);
   }

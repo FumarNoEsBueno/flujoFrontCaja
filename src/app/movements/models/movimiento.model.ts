@@ -80,6 +80,16 @@ export interface CreateMovimientoRequest {
   productos?: Array<{ prod_id: number; pdmo_cantidad: number }>;
 }
 
+/** Same as CreateMovimientoRequest but WITHOUT caja_id (caja cannot be edited) */
+export interface UpdateMovimientoRequest {
+  movi_descripcion: string;
+  movi_fecha_ingreso: string; // YYYY-MM-DD
+  movi_monto_total: string;
+  movi_medio_pago: string;
+  movi_propina?: string | null;
+  productos?: Array<{ prod_id: number; pdmo_cantidad: number }>;
+}
+
 export interface MovimientoFilters {
   movi_id_transaccion?: string;
   caja_id?: number;

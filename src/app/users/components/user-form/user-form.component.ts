@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   injectMutation,
@@ -13,6 +13,7 @@ import type { CreateUsuarioPayload, UpdateUsuarioPayload, UsuarioTabla } from '.
 import {
   ButtonComponent,
   InputComponent,
+  RutInputComponent,
   ToastService,
 } from '../../../shared/components';
 import { CustomAutocompleteComponent } from '../../../shared/components/autocomplete/custom-autocomplete.component';
@@ -26,6 +27,7 @@ import { IconCloseComponent, IconWarningComponent, IconSpinnerComponent } from '
     FormsModule,
     ButtonComponent,
     InputComponent,
+    RutInputComponent,
     CustomAutocompleteComponent,
     IconCloseComponent,
     IconWarningComponent,
@@ -113,25 +115,14 @@ import { IconCloseComponent, IconWarningComponent, IconSpinnerComponent } from '
                 name="usua_apellido_m"
               />
 
-              <div class="grid grid-cols-2 gap-4">
-                <!-- RUT -->
-                <app-input
-                  label="RUT (sin DV)"
-                  placeholder="Ej: 20194802"
-                  [required]="true"
-                  [(ngModel)]="usua_rut"
-                  name="usua_rut"
-                />
-
-                <!-- DV -->
-                <app-input
-                  label="Dígito Verificador"
-                  placeholder="Ej: 9 o k"
-                  [required]="true"
-                  [(ngModel)]="usua_dv"
-                  name="usua_dv"
-                />
-              </div>
+              <!-- RUT unificado con validación en tiempo real -->
+              <app-rut-input
+                label="RUT"
+                placeholder="Ej: 20194802-9"
+                [required]="true"
+                [(ngModel)]="usua_rut"
+                name="usua_rut"
+              />
 
               <!-- Correo -->
               <app-input
@@ -225,21 +216,20 @@ export class UserFormComponent {
   cerrar  = output<void>();
   guardado = output<void>();
 
-  // ─── Estado interno ────────────────────────────────────────────────────────
+  // ─── Estado interno ───────────────────────────────────────────────────────
 
   esEdicion = computed(() => this.usuario() !== null);
 
   errorMsg = signal('');
 
   // Signals individuales por campo — ngModel necesita getter/setter para ser reactivo con signals
-  private _nombre      = signal('');
-  private _apellidoP   = signal('');
-  private _apellidoM   = signal('');
-  private _rut         = signal('');
-  private _dv          = signal('');
-  private _correo      = signal('');
-  private _fechaNac    = signal('');
-  private _password    = signal('');
+  private _nombre    = signal('');
+  private _apellidoP = signal('');
+  private _apellidoM = signal('');
+  private _rut       = signal('');    // RUT completo "20194802-9"
+  private _correo    = signal('');
+  private _fechaNac  = signal('');
+  private _password  = signal('');
 
   get usua_nombre():      string { return this._nombre();    }
   set usua_nombre(v:      string) { this._nombre.set(v ?? '');    }
@@ -249,8 +239,6 @@ export class UserFormComponent {
   set usua_apellido_m(v:  string) { this._apellidoM.set(v ?? ''); }
   get usua_rut():         string { return this._rut();       }
   set usua_rut(v:         string) { this._rut.set(v ?? '');        }
-  get usua_dv():          string { return this._dv();        }
-  set usua_dv(v:          string) { this._dv.set(v ?? '');         }
   get usua_correo():      string { return this._correo();    }
   set usua_correo(v:      string) { this._correo.set(v ?? '');     }
   get usua_fecha_nac():   string { return this._fechaNac();  }
@@ -264,7 +252,6 @@ export class UserFormComponent {
     this._apellidoP.set('');
     this._apellidoM.set('');
     this._rut.set('');
-    this._dv.set('');
     this._correo.set('');
     this._fechaNac.set('');
     this._password.set('');
@@ -289,8 +276,8 @@ export class UserFormComponent {
         this._nombre.set(detalle.nombre);
         this._apellidoP.set(detalle.apellidoP);
         this._apellidoM.set(detalle.apellidoM ?? '');
+        // El detalle ya trae el RUT completo "20194802-9" — RutInputComponent lo formatea
         this._rut.set(detalle.rut);
-        this._dv.set(detalle.dv);
         this._correo.set(detalle.correo ?? '');
         this._fechaNac.set(detalle.fechaNac);
         this._password.set('');
@@ -323,7 +310,6 @@ export class UserFormComponent {
       this._nombre()?.trim() &&
       this._apellidoP()?.trim() &&
       this._rut()?.trim() &&
-      this._dv()?.trim() &&
       this._fechaNac()?.trim() &&
       tieneRol;
 
@@ -375,7 +361,6 @@ export class UserFormComponent {
         usua_apellido_p: this._apellidoP().trim(),
         usua_apellido_m: this._apellidoM().trim() || null,
         usua_rut:        this._rut().trim(),
-        usua_dv:         this._dv().trim(),
         usua_correo:     this._correo().trim() || null,
         usua_fecha_nac:  this._fechaNac(),
         role_id:         Number(rol.id),
@@ -391,7 +376,6 @@ export class UserFormComponent {
         usua_apellido_p: this._apellidoP().trim(),
         usua_apellido_m: this._apellidoM().trim() || null,
         usua_rut:        this._rut().trim(),
-        usua_dv:         this._dv().trim(),
         usua_correo:     this._correo().trim() || null,
         usua_fecha_nac:  this._fechaNac(),
         usua_password:   this._password().trim(),

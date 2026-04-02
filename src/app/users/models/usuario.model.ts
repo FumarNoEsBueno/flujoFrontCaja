@@ -19,10 +19,9 @@ export interface UsuarioDetalle {
   nombre: string;
   apellidoP: string;
   apellidoM: string | null;
-  rut: string;
-  dv: string;
+  rut: string;           // '20194802-9' (RUT completo con DV)
   correo: string | null;
-  fechaNac: string;     // 'YYYY-MM-DD'
+  fechaNac: string;      // 'YYYY-MM-DD'
   rolNombre: string;
   roleId: number;
   cajas: UsuarioCaja[];
@@ -45,10 +44,9 @@ export interface CreateUsuarioPayload {
   usua_nombre: string;
   usua_apellido_p: string;
   usua_apellido_m?: string | null;
-  usua_rut: string;
-  usua_dv: string;
+  usua_rut: string;          // RUT completo con formato "20194802-9"
   usua_correo?: string | null;
-  usua_fecha_nac: string;   // 'YYYY-MM-DD'
+  usua_fecha_nac: string;    // 'YYYY-MM-DD'
   usua_password: string;
   role_id: number;
 }
@@ -57,8 +55,7 @@ export interface UpdateUsuarioPayload {
   usua_nombre?: string;
   usua_apellido_p?: string;
   usua_apellido_m?: string | null;
-  usua_rut?: string;
-  usua_dv?: string;
+  usua_rut?: string;         // RUT completo con formato "20194802-9"
   usua_correo?: string | null;
   usua_fecha_nac?: string;
   usua_password?: string;
